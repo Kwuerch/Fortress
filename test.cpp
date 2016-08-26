@@ -3,9 +3,10 @@
 #include <cstdio>
 #include <string.h>
 
-#define notAFile 0xfefefefefefefefe;
-#define notHFile 0x7f7f7f7f7f7f7f7f;
+#define notAFile  0xfefefefefefefefe;
+#define notHFile  0x7f7f7f7f7f7f7f7f;
 #define notAHFile 0x7e7e7e7e7e7e7e7e;
+#define aFile     0x0101010101010101;
 
 using namespace std;
 
@@ -17,6 +18,8 @@ uint64_t eastMask[64];
 uint64_t westMask[64];
 uint64_t diagMask[64];
 uint64_t adiaMask[64];
+uint64_t fromToMask[64][64];
+uint64_t indexMask[64];
 
 uint64_t wp = 0x000000000000ff00;
 uint64_t wr = 0x0000000000000081;
@@ -114,13 +117,97 @@ void initWestMask(){
 }
 
 
+void initIndexBoard(){
+   uint64_t bb = 1;
+   for( int i = 0; i < 64; i++){
+     indexMask[i] = bb; 
+     bb <<= 1;
+   }
+}
+
+void initFromTo(){
+   for(int i = 0; i < 64; i++){
+      uint64_t bb = indexMask[i];
+
+      for(int j = i + 8; j < 64; j += 8){
+         bb |= nortOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+      }
+
+      bb = indexMask[i];
+
+      for(int j = i - 8; j > -1; j -= 8){
+         bb |= soutOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+      }
+
+      bb = indexMask[i];
+      
+      int eastBound = (i/8) * 8 + 8;
+      for(int j = i + 1; j < eastBound; j += 1){
+         bb |= eastOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+      }
+
+      bb = indexMask[i];
+
+      int westBound = (i/8) * 8 - 1;
+      for(int j = i - 1; j > westBound; j -= 1){
+         bb |= westOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+      }
+
+      bb = indexMask[i];
+
+      int j = i + 9;
+      while(j < 64 && neasOne(indexMask[j-9])){
+         bb |= neasOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+         j += 9;
+      }
+
+      bb = indexMask[i];
+
+      j = i - 9;
+      while(j > 0 && swesOne(indexMask[j + 9])){
+         bb |= swesOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+         j -= 9;
+      }
+
+      bb = indexMask[i];
+
+      j = i + 7;
+      while(j > 0 && nwesOne(indexMask[j - 7])){
+         bb |= nwesOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+         j += 7;
+      }
+
+      bb = indexMask[i];
+
+      j = i - 7;
+      while(j > 0 && seasOne(indexMask[j + 7])){
+         bb |= seasOne(bb);
+         fromToMask[i][j] = bb ^ indexMask[i];
+         printf("From: %i", i);
+         printf(" To: %i\n", j);
+         printBoard(fromToMask[i][j]);
+         printf("--------\n");
+         j -= 7;
+      }
+   }
+}
 
 void initMasks(){
    initSoutMask();
    initNortMask();
    initEastMask();
    initWestMask();
+   initIndexBoard();
+   initFromTo();
 }
+
 
 // Shoul take an enum
 uint64_t rookAttack( uint8_t sq ) { return westMask[sq] | eastMask[sq] | nortMask[sq] | soutMask[sq]; }
@@ -128,8 +215,8 @@ uint64_t rookAttack( uint8_t sq ) { return westMask[sq] | eastMask[sq] | nortMas
 
 int main(){
    initMasks();
-   printBoard(rookAttack(32));
-   printf("------------------------------------\n");
-   printBoard(white());
+
+
+
    return 0;
 }
