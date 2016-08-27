@@ -6,9 +6,14 @@
 #define notAFile  0xfefefefefefefefe;
 #define notHFile  0x7f7f7f7f7f7f7f7f;
 #define notAHFile 0x7e7e7e7e7e7e7e7e;
+
+#define babMask 0xff818181818181ff;
+
 #define aFile     0x0101010101010101;
 
 using namespace std;
+
+enum Piece { Pawn=0, Rook, Knight, Bishop, Queen, King };
 
 uint64_t testFunct (){ return 3; };
 
@@ -68,6 +73,14 @@ void printBoard( uint64_t bb ){
    }
 }
 
+void initIndexBoard(){
+   uint64_t bb = 1;
+   for( int i = 0; i < 64; i++){
+     indexMask[i] = bb; 
+     bb <<= 1;
+   }
+}
+
 void initSoutMask( ){
    uint64_t mask = 0x0080808080808080;
    int i;
@@ -116,13 +129,36 @@ void initWestMask(){
    }
 }
 
+void initDiagMask(){
+   uint64_t bb;
 
-void initIndexBoard(){
-   uint64_t bb = 1;
-   for( int i = 0; i < 64; i++){
-     indexMask[i] = bb; 
-     bb <<= 1;
+   for(int i = 0; i < 64; i++){
+      for(bb = neasOne(indexMask[i]); bb != 0; bb = neasOne(bb)){
+         diagMask[i] |= bb;
+      }
+
+      for(bb = swesOne(indexMask[i]); bb != 0; bb = swesOne(bb)){
+         diagMask[i] |= bb;
+      }
    }
+}
+
+void initAdiaMask(){
+   uint64_t bb;
+
+   for(int i = 0; i < 64; i++){
+      for(bb = nwesOne(indexMask[i]); bb != 0; bb = nwesOne(bb)){
+         adiaMask[i] |= bb;
+      }
+
+      for(bb = seasOne(indexMask[i]); bb != 0; bb = seasOne(bb)){
+         adiaMask[i] |= bb;
+      }
+   }
+}
+
+void initKngtMask(){
+   
 }
 
 void initFromTo(){
@@ -190,33 +226,51 @@ void initFromTo(){
       while(j > 0 && seasOne(indexMask[j + 7])){
          bb |= seasOne(bb);
          fromToMask[i][j] = bb ^ indexMask[i];
-         printf("From: %i", i);
-         printf(" To: %i\n", j);
-         printBoard(fromToMask[i][j]);
-         printf("--------\n");
          j -= 7;
       }
    }
 }
 
 void initMasks(){
+   initIndexBoard();
    initSoutMask();
    initNortMask();
    initEastMask();
    initWestMask();
-   initIndexBoard();
+   initDiagMask();
+   initAdiaMask();
    initFromTo();
 }
 
-
-// Shoul take an enum
-uint64_t rookAttack( uint8_t sq ) { return westMask[sq] | eastMask[sq] | nortMask[sq] | soutMask[sq]; }
+uint64_t pieceAttack( Piece p, uint8_t sq ) { 
+   if( p == Rook){
+      return westMask[sq] | eastMask[sq] | nortMask[sq] | soutMask[sq];
+   }else if( p = Bishop ){
+      return diagMask[sq] | adiaMask[sq];
+   }else if( p = Queen ){
+      return pieceAttack( Rook, sq ) | pieceAttack( Bishop, sq );
+   }else{
+      return 0;
+   }
+}
 
 
 int main(){
    initMasks();
 
+   /**
+   printf("From: %i", i);
+   printf(" To: %i\n", j);
+   printBoard(fromToMask[i][j]);
+   printf("--------\n");
+   */
 
+   for(int i = 0; i < 64; i++){
+      printf("Index: %i\n", i);
+      printBoard(adiaMask[i]);
+      printf("-------\n");
+   }
+   
 
    return 0;
 }
