@@ -1,6 +1,8 @@
 #ifndef BOARD_H_INCLUDED
 #define BOARD_H_INCLUDED
 
+#define DEBRUIJN_CONST 0x03f79d71b4cb0a89
+
 typedef struct board board;
 struct board{
     uint64_t wp;

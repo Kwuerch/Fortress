@@ -12,12 +12,8 @@ struct chess_mask{
     uint64_t diagMask[64];
     uint64_t adiaMask[64];
 
-    uint64_t rookMask[64];
-    uint64_t kngtMask[64];
-    uint64_t bishMask[64];
-    uint64_t quenMask[64];
-    uint64_t kingMask[64];
-    uint64_t pawnMask[64];
+    uint64_t piecMask[6][64];
+    uint64_t blBeMask[6][64];
 
     uint64_t indxMask[64];
     uint64_t fromToMask[64][64];
@@ -33,5 +29,7 @@ void initAdiaMask( chess_mask * cm );
 void initKngtMask( chess_mask * cm );
 void initFromTo( chess_mask * cm );
 void initMasks( chess_mask * cm );
+void initPieceMask( chess_mask * cm );
+void initBlockersAndBeyond( chess_mask * cm );
 
 #endif

@@ -168,11 +168,25 @@ void initFromTo( chess_mask * cm ){
    }
 }
 
-void initPieceMask(  chess_mask * cm  ) { 
+void initPieceMask(  chess_mask *cm  ) { 
     for(int i = 0; i < 64; i++ ){
-        cm -> rookMask[i] = cm -> westMask[i] | cm -> eastMask[i] | cm -> nortMask[i] | cm -> soutMask[i];
-        cm -> bishMask[i] = cm -> diagMask[i] | cm -> adiaMask[i];
-        cm -> quenMask[i] = cm -> bishMask[i] | cm -> rookMask[i];
+        cm -> piecMask[PAWN][i] = 0;
+        cm -> piecMask[ROOK][i] = cm -> westMask[i] | cm -> eastMask[i] | cm -> nortMask[i] | cm -> soutMask[i];
+        cm -> piecMask[BISHOP][i] = cm -> diagMask[i] | cm -> adiaMask[i];
+        cm -> piecMask[KNIGHT][i] = 0;
+        cm -> piecMask[QUEEN][i] = cm -> piecMask[ROOK][i] | cm -> piecMask[BISHOP][i];
+        cm -> piecMask[KING][i] = 0;
+    }
+}
+
+void initBlockersAndBeyond( chess_mask *cm){
+    for(int i = 0; i < 64; i++ ){
+        cm -> blBeMask[PAWN][i] = cm -> piecMask[PAWN][i] & babMask;
+        cm -> blBeMask[ROOK][i] = cm -> piecMask[ROOK][i] & babMask;
+        cm -> blBeMask[BISHOP][i] = cm -> piecMask[BISHOP][i] & babMask;
+        cm -> blBeMask[KNIGHT][i] = cm -> piecMask[KNIGHT][i] & babMask;
+        cm -> blBeMask[QUEEN][i] = cm -> piecMask[QUEEN][i] & babMask;
+        cm -> blBeMask[KING][i] = cm -> piecMask[KING][i] & babMask;
     }
 }
 
@@ -185,5 +199,6 @@ void initMasks( chess_mask * cm ){
    initDiagMask( cm );
    initAdiaMask( cm );
    initPieceMask( cm );
+   initBlockersAndBeyond( cm );
    initFromTo( cm );
 }
