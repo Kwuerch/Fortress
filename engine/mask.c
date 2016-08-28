@@ -7,35 +7,47 @@
 #include "move.h"
 #include "config.h"
 
+uint64_t soutMask[64];
+uint64_t nortMask[64];
+uint64_t eastMask[64];
+uint64_t westMask[64];
+uint64_t diagMask[64];
+uint64_t adiaMask[64];
+
+uint64_t piecMask[6][64];
+uint64_t blBeMask[6][64];
+
+uint64_t indxMask[64];
+uint64_t fromToMask[64][64];
 
 
-void initIndexBoard( chess_mask * cm ){
+void initIndexBoard(){
    uint64_t bb = 1;
    for( int i = 0; i < 64; i++){
-     cm -> indxMask[i] = bb; 
+     indxMask[i] = bb; 
      bb <<= 1;
    }
 }
 
-void initSoutMask( chess_mask * cm ){
+void initSoutMask(){
    uint64_t mask = 0x0080808080808080;
    int i;
    for(i = 63; i > -1; i--){
-      cm -> soutMask[i] = mask;
+      soutMask[i] = mask;
       mask >>= 1;
    }
 }
 
-void initNortMask( chess_mask * cm ){
+void initNortMask(){
    uint64_t mask = 0x0101010101010100;
    int i;
    for(i = 0; i < 64; i++){
-      cm -> nortMask[i] = mask;
+      nortMask[i] = mask;
       mask <<= 1;
    }
 }
 
-void initEastMask( chess_mask * cm ){
+void initEastMask(){
    uint64_t eastRay = 0x00000000000000fe;
    uint64_t loopRay;
    int i; 
@@ -43,14 +55,14 @@ void initEastMask( chess_mask * cm ){
    for( int i = 0; i < 8; i++){
       loopRay = eastRay;
       for( int j = i; j < 64; j+=8){
-         cm -> eastMask[j] = loopRay; 
+         eastMask[j] = loopRay; 
          loopRay = nortOne(loopRay);
       }
       eastRay = eastOne(eastRay);
    }
 }
 
-void initWestMask( chess_mask * cm ){
+void initWestMask(){
    uint64_t westRay = 0x000000000000007f;
    uint64_t loopRay;
    int i; 
@@ -58,147 +70,147 @@ void initWestMask( chess_mask * cm ){
    for( int i = 7; i > -1; i--){
       loopRay = westRay;
       for( int j = i; j < 64; j+=8){
-         cm -> westMask[j] = loopRay; 
+         westMask[j] = loopRay; 
          loopRay = nortOne(loopRay);
       }
       westRay = westOne(westRay);
    }
 }
 
-void initDiagMask( chess_mask * cm ){
+void initDiagMask(){
    uint64_t bb;
 
    for(int i = 0; i < 64; i++){
-      for(bb = neasOne(cm -> indxMask[i]); bb != 0; bb = neasOne(bb)){
-         cm -> diagMask[i] |= bb;
+      for(bb = neasOne(indxMask[i]); bb != 0; bb = neasOne(bb)){
+         diagMask[i] |= bb;
       }
 
-      for(bb = swesOne(cm -> indxMask[i]); bb != 0; bb = swesOne(bb)){
-         cm -> diagMask[i] |= bb;
+      for(bb = swesOne(indxMask[i]); bb != 0; bb = swesOne(bb)){
+         diagMask[i] |= bb;
       }
    }
 }
 
-void initAdiaMask( chess_mask * cm ){
+void initAdiaMask(){
    uint64_t bb;
 
    for(int i = 0; i < 64; i++){
-      for(bb = nwesOne(cm -> indxMask[i]); bb != 0; bb = nwesOne(bb)){
-         cm -> adiaMask[i] |= bb;
+      for(bb = nwesOne(indxMask[i]); bb != 0; bb = nwesOne(bb)){
+         adiaMask[i] |= bb;
       }
 
-      for(bb = seasOne(cm -> indxMask[i]); bb != 0; bb = seasOne(bb)){
-         cm -> adiaMask[i] |= bb;
+      for(bb = seasOne(indxMask[i]); bb != 0; bb = seasOne(bb)){
+         adiaMask[i] |= bb;
       }
    }
 }
 
 
-void initKngtMask( chess_mask * cm ){
+void initKngtMask(){
    
 }
 
-void initFromTo( chess_mask * cm ){
+void initFromTo(){
    for(int i = 0; i < 64; i++){
-      uint64_t bb = cm -> indxMask[i];
+      uint64_t bb = indxMask[i];
 
       for(int j = i + 8; j < 64; j += 8){
          bb |= nortOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
       }
 
-      bb = cm -> indxMask[i];
+      bb = indxMask[i];
 
       for(int j = i - 8; j > -1; j -= 8){
          bb |= soutOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
       }
 
-      bb = cm -> indxMask[i];
+      bb = indxMask[i];
       
       int eastBound = (i/8) * 8 + 8;
       for(int j = i + 1; j < eastBound; j += 1){
          bb |= eastOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
       }
 
-      bb = cm -> indxMask[i];
+      bb = indxMask[i];
 
       int westBound = (i/8) * 8 - 1;
       for(int j = i - 1; j > westBound; j -= 1){
          bb |= westOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
       }
 
-      bb = cm -> indxMask[i];
+      bb = indxMask[i];
 
       int j = i + 9;
-      while(j < 64 && neasOne(cm -> indxMask[j-9])){
+      while(j < 64 && neasOne(indxMask[j-9])){
          bb |= neasOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
          j += 9;
       }
 
-      bb = cm -> indxMask[i];
+      bb = indxMask[i];
 
       j = i - 9;
-      while(j > 0 && swesOne(cm -> indxMask[j + 9])){
+      while(j > 0 && swesOne(indxMask[j + 9])){
          bb |= swesOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
          j -= 9;
       }
 
-      bb = cm -> indxMask[i];
+      bb = indxMask[i];
 
       j = i + 7;
-      while(j > 0 && nwesOne(cm -> indxMask[j - 7])){
+      while(j > 0 && nwesOne(indxMask[j - 7])){
          bb |= nwesOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
          j += 7;
       }
 
-      bb = cm -> indxMask[i];
+      bb = indxMask[i];
 
       j = i - 7;
-      while(j > 0 && seasOne(cm -> indxMask[j + 7])){
+      while(j > 0 && seasOne(indxMask[j + 7])){
          bb |= seasOne(bb);
-         cm -> fromToMask[i][j] = bb ^ cm -> indxMask[i];
+         fromToMask[i][j] = bb ^ indxMask[i];
          j -= 7;
       }
    }
 }
 
-void initPieceMask(  chess_mask *cm  ) { 
+void initPieceMask() { 
     for(int i = 0; i < 64; i++ ){
-        cm -> piecMask[PAWN][i] = 0;
-        cm -> piecMask[ROOK][i] = cm -> westMask[i] | cm -> eastMask[i] | cm -> nortMask[i] | cm -> soutMask[i];
-        cm -> piecMask[BISHOP][i] = cm -> diagMask[i] | cm -> adiaMask[i];
-        cm -> piecMask[KNIGHT][i] = 0;
-        cm -> piecMask[QUEEN][i] = cm -> piecMask[ROOK][i] | cm -> piecMask[BISHOP][i];
-        cm -> piecMask[KING][i] = 0;
+        piecMask[PAWN][i] = 0;
+        piecMask[ROOK][i] = westMask[i] | eastMask[i] | nortMask[i] | soutMask[i];
+        piecMask[BISHOP][i] = diagMask[i] | adiaMask[i];
+        piecMask[KNIGHT][i] = 0;
+        piecMask[QUEEN][i] = piecMask[ROOK][i] | piecMask[BISHOP][i];
+        piecMask[KING][i] = 0;
     }
 }
 
-void initBlockersAndBeyond( chess_mask *cm){
+void initBlockersAndBeyond(){
     for(int i = 0; i < 64; i++ ){
-        cm -> blBeMask[PAWN][i] = cm -> piecMask[PAWN][i] & babMask;
-        cm -> blBeMask[ROOK][i] = cm -> piecMask[ROOK][i] & babMask;
-        cm -> blBeMask[BISHOP][i] = cm -> piecMask[BISHOP][i] & babMask;
-        cm -> blBeMask[KNIGHT][i] = cm -> piecMask[KNIGHT][i] & babMask;
-        cm -> blBeMask[QUEEN][i] = cm -> piecMask[QUEEN][i] & babMask;
-        cm -> blBeMask[KING][i] = cm -> piecMask[KING][i] & babMask;
+        blBeMask[PAWN][i] = piecMask[PAWN][i] & babMask;
+        blBeMask[ROOK][i] = piecMask[ROOK][i] & babMask;
+        blBeMask[BISHOP][i] = piecMask[BISHOP][i] & babMask;
+        blBeMask[KNIGHT][i] = piecMask[KNIGHT][i] & babMask;
+        blBeMask[QUEEN][i] = piecMask[QUEEN][i] & babMask;
+        blBeMask[KING][i] = piecMask[KING][i] & babMask;
     }
 }
 
-void initMasks( chess_mask * cm ){
-   initIndexBoard( cm );
-   initSoutMask( cm );
-   initNortMask( cm );
-   initEastMask( cm );
-   initWestMask( cm );
-   initDiagMask( cm );
-   initAdiaMask( cm );
-   initPieceMask( cm );
-   initBlockersAndBeyond( cm );
-   initFromTo( cm );
+void initMasks(){
+   initIndexBoard();
+   initSoutMask();
+   initNortMask();
+   initEastMask();
+   initWestMask();
+   initDiagMask();
+   initAdiaMask();
+   initPieceMask();
+   initBlockersAndBeyond();
+   initFromTo();
 }
