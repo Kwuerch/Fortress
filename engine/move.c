@@ -17,7 +17,7 @@ uint64_t swesOne( uint64_t bb ) { return ( bb >> 9 ) & notHFile; }
 uint64_t rayAttacks( uint64_t occupied, Piece p, uint8_t sq ){
     uint64_t moves = piecMask[p][sq];
     for( uint64_t blockers = blBeMask[p][sq] & occupied; blockers != 0; blockers &= (blockers - 1)){//Better understand xor with blockers - 1
-        moves &= fromToMask[sq][bitScanForward(blockers)]; 
+        moves &= ~shadMask[sq][bitScanForward(blockers)]; 
     }
     return moves;
 }
