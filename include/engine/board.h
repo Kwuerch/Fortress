@@ -21,8 +21,10 @@ struct board{
 
 void initBoard( board *b);
 
-uint64_t black( board *b );
-uint64_t white( board *b );
+uint64_t black( board b );
+uint64_t white( board b );
+
+uint8_t bitScanForward( uint64_t bb);
 
 const char *byteToBinary( char bt );
 void printBoard( uint64_t bb );
