@@ -129,7 +129,22 @@ void initAdiaMask(){
 
 
 void initKngtMask(){
-   
+    for(int i = 0; i < 64; i++){
+        uint64_t index = indxMask[i];
+        piecMask[KNIGHT][i] |= ((index <<  6) | (index >> 10)) & notGHFile;
+        piecMask[KNIGHT][i] |= ((index << 15) | (index >> 17)) & notHFile;
+        piecMask[KNIGHT][i] |= ((index << 17) | (index >> 15)) & notAFile;
+        piecMask[KNIGHT][i] |= ((index << 10) | (index >>  6)) & notABFile;
+    }
+}
+
+void initKingMask(){
+    for(int i = 0; i < 64; i++){
+        uint64_t index = indxMask[i];
+        piecMask[KING][i] |= ((index << 7) | (index >> 1) | (index >> 9)) & notHFile;
+        piecMask[KING][i] |= ((index >> 7) | (index << 1) | (index << 9)) & notAFile;
+        piecMask[KING][i] |= (index << 8) | (index >> 8);
+    }
 }
 
 void initFromTo(){
@@ -278,10 +293,11 @@ void initPieceMask() {
         piecMask[PAWN][i] = 0;
         piecMask[ROOK][i] = westMask[i] | eastMask[i] | nortMask[i] | soutMask[i];
         piecMask[BISHOP][i] = diagMask[i] | adiaMask[i];
-        piecMask[KNIGHT][i] = 0;
         piecMask[QUEEN][i] = piecMask[ROOK][i] | piecMask[BISHOP][i];
-        piecMask[KING][i] = 0;
     }
+
+    initKngtMask();
+    initKingMask();
 }
 
 void initBlockersAndBeyond(){
