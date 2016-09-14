@@ -20,4 +20,6 @@ void testMoveGen(){
     genRookMoves(occupied(&b), black(&b), b.wr, &trash);
     genBishopMoves(occupied(&b), black(&b), b.wh, &trash);
     genQueenMoves(occupied(&b), black(&b), b.wq, &trash);
+    genKingMoves(occupied(&b), black(&b), b.wk, &trash);
+    genKnightMoves(occupied(&b), black(&b), b.wn, &trash);
 }

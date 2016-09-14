@@ -72,18 +72,46 @@ void genPawnMoves(uint64_t occ, uint64_t opp, uint64_t pawns, Move* mvs){
 
 }
 
-void genKnightMoves(uint64_t occ, uint64_t opp, uint64_t knight, Move* mvs){
+void genKnightMoves(uint64_t occ, uint64_t opp, uint64_t knights, Move* mvs){
+    if(knights == 0){ return; }
 
+    // Go through each knight and append each individual's moves 
+    for(uint8_t from; knights != 0; knights &= (knights -1)){
+        from = bitScanForward(knights);
+        for(uint64_t attacks = piecMask[KNIGHT][from] & opp; attacks != 0; attacks &= (attacks - 1)){
+            Move m = createMove(from, bitScanForward(attacks), CAPTURE);
+            printMove(m);
+        }
+
+        for(uint64_t quiets = piecMask[KNIGHT][from] & ~occ; quiets != 0; quiets &= (quiets - 1)){
+            Move m = createMove(from, bitScanForward(quiets), QUIET);
+            printMove(m);
+        }
+    }
 }
 
 void genKingMoves(uint64_t occ, uint64_t opp, uint64_t king, Move* mvs){
+    if(king == 0){ return; }
 
+    // Go through each knight and append each individual's moves 
+    for(uint8_t from; king != 0; king &= (king -1)){
+        from = bitScanForward(king);
+        for(uint64_t attacks = piecMask[KING][from] & opp; attacks != 0; attacks &= (attacks - 1)){
+            Move m = createMove(from, bitScanForward(attacks), CAPTURE);
+            printMove(m);
+        }
+
+        for(uint64_t quiets = piecMask[KING][from] & ~occ; quiets != 0; quiets &= (quiets - 1)){
+            Move m = createMove(from, bitScanForward(quiets), QUIET);
+            printMove(m);
+        }
+    }
 }
 
 void genQueenMoves(uint64_t occ, uint64_t opp, uint64_t queens, Move* mvs){
     if(queens == 0){ return; }
 
-    // Go through each rook and go through each move for each rook
+    // Go through each queen and go through each queens moves 
     for(uint8_t from; queens != 0; queens &= (queens -1)){
         from = bitScanForward(queens);
         uint64_t moveSquares = rayAttacks(occ, QUEEN, from);
@@ -122,7 +150,7 @@ void genRookMoves(uint64_t occ, uint64_t opp, uint64_t rooks, Move* mvs){
 void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, Move* mvs){
     if(bishops == 0){ return; }
 
-    // Go through each rook and go through each move for each rook
+    // Go through each bishop and go through each bishop's moves 
     for(uint8_t from; bishops != 0; bishops &= (bishops -1)){
         from = bitScanForward(bishops);
         uint64_t moveSquares = rayAttacks(occ, BISHOP, from);
