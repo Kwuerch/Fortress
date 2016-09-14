@@ -15,7 +15,7 @@ extern uint64_t diagMask[64];
 extern uint64_t adiaMask[64];
 
 extern uint64_t piecMask[6][64];
-extern uint64_t blBeMask[6][64];
+extern uint64_t blBeMask[3][64];
 
 extern uint64_t indxMask[64];
 extern uint64_t fromToMask[64][64];

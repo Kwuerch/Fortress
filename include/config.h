@@ -13,7 +13,8 @@
 #define babMask 0x007e7e7e7e7e7e00
 
 typedef enum { WHITE = 0, BLACK } Color;
-typedef enum { PAWN = 0, ROOK, KNIGHT, BISHOP, QUEEN, KING } Piece;
+// Queen, Rook, and Pawn come first to decrease size of blBeMask 
+typedef enum { QUEEN = 0, BISHOP, ROOK, PAWN, KNIGHT, KING } Piece;
 typedef enum { RANK1 = 0, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8 } Rank;
 typedef enum { FILEA = 0, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH } File;
 typedef enum { QUIET = 0, DOUBLE_PAWN, KING_CASTLE, QUEEN_CASTLE, CAPTURE, EP_CAPTURE, 
