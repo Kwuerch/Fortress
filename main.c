@@ -4,6 +4,7 @@
 #include "mask.h"
 #include "board.h"
 #include "move.h"
+#include "test.h"
 
 int main(){
     initMasks();
@@ -44,6 +45,7 @@ int main(){
     //Move m = createMove(63, 12, 3);
     //printMove(m);
     
+    testMoveGen();
 
     return 0;
 }

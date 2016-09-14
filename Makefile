@@ -1,5 +1,7 @@
-SOURCE=engine/*.c main.c
+SOURCE=engine/*.c test/*.c main.c
 EXE=fortress
-INCLUDE=./include/engine
+INCLUDES += -I ./include \
+			   -I ./include/test \
+				-I ./include/engine
 all:
-	gcc -g -o $(EXE) $(SOURCE) -I $(INCLUDE)
+	gcc -g -o $(EXE) $(SOURCE) $(INCLUDES)

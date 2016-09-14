@@ -3,6 +3,8 @@
 
 #define DEBRUIJN_CONST 0x03f79d71b4cb0a89
 
+#include <stdint.h>
+
 typedef struct board board;
 struct board{
     uint64_t wp;
