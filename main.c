@@ -35,17 +35,15 @@ int main(){
     */
 
 
-    printBoard((black(b) | b.wr) & blBeMask[ROOK][0]);
-    printBoard(rayAttacks(0x0101010000000001, ROOK, 0));
+    //printBoard((black(&b) | b.wr) & blBeMask[ROOK][0]);
+    //printBoard(rayAttacks(0x0101010000000001, ROOK, 0));
     //printBoard(piecMask[KNIGHT][27]);
     //printBoard(piecMask[KNIGHT][0]);
     //printBoard(piecMask[KING][0]);
     //printBoard(piecMask[KING][27]);
-    Move m;
-    createMove(63, 12, 3, &m);
-    printf("To:%i", getTo(&m));
-    printf("From:%i", getFrom(&m));
-    printf("Flags:%i", getMoveFlags(&m));
+    //Move m = createMove(63, 12, 3);
+    //printMove(m);
+    
 
     return 0;
 }

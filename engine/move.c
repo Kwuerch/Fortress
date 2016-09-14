@@ -23,55 +23,83 @@ uint64_t rayAttacks( uint64_t occupied, Piece p, uint8_t sq ){
     return moves;
 }
 
-void createMove( uint8_t from, uint8_t to, uint8_t moveFlag,  Move* mv){
-    *mv = 0;
-    *mv |= (0x3f & from);
-    *mv <<= 6;
-    *mv |= (0x3f & to);
-    *mv <<= 4;
-    *mv |= (0xf & moveFlag);
+Move createMove( uint8_t from, uint8_t to, uint8_t moveFlag){
+    Move mv = 0;
+    mv |= (0x3f & from);
+    mv <<= 6;
+    mv |= (0x3f & to);
+    mv <<= 4;
+    mv |= (0xf & moveFlag);
+    return mv;
 }
 
-uint8_t getFrom(Move* mv){ return (*mv) >> 10; }
+uint8_t getFrom(Move mv){ return mv >> 10; }
 
-uint8_t getTo(Move* mv){ return ( *mv >> 4) & 0x3f; }
+uint8_t getTo(Move mv){ return ( mv >> 4) & 0x3f; }
 
-uint8_t getMoveFlags(Move* mv){ return *mv & 0xf; }
+uint8_t getMoveFlags(Move mv){ return mv & 0xf; }
+
+void printMove(Move mv){
+    printf("To:%i ", getTo(mv));
+    printf("From:%i ", getFrom(mv));
+    printf("Flags:%i\n ", getMoveFlags(mv));
+}
 
 // TODO - update to Linked List instead of array
 
 void genMoves(Color colr, board* b, Move* mvs){
+    uint64_t occ = occupied(b);
+    if(colr == WHITE){
+        genPawnMoves(occ, b -> wp, mvs);
+        genKnightMoves(occ, b -> wn, mvs);
+        genKingMoves(occ, b -> wk, mvs);
+        genQueenMoves(occ, b -> wq, mvs);
+        genRookMoves(occ, b -> wr, mvs);
+        genBishopMoves(occ, b -> wh, mvs);
+    }else{
+        genPawnMoves(occ, b -> bp, mvs);
+        genKnightMoves(occ, b -> bn, mvs);
+        genKingMoves(occ, b -> bk, mvs);
+        genQueenMoves(occ, b -> bq, mvs);
+        genRookMoves(occ, b -> br, mvs);
+        genBishopMoves(occ, b -> bh, mvs);
+    }
+}
+
+void genPawnMoves(uint64_t occupied, uint64_t pawns, Move* mvs){
 
 }
 
-void genPawnMoves(Color colr, board* b, Move* mvs){
+void genKnightMoves(uint64_t occupied, uint64_t knight, Move* mvs){
 
 }
 
-void genKnightMoves(Color colr, board* b, Move* mvs){
+void genKingMoves(uint64_t occupied, uint64_t king, Move* mvs){
 
 }
 
-void genKingMoves(Color colr, board* b, Move* mvs){
+void genQueenMoves(uint64_t occupied, uint64_t queens, Move* mvs){
 
 }
 
-void genQueenMoves(Color colr, board* b, Move* mvs){
+void genRookMoves(uint64_t occupied, uint64_t rooks, Move* mvs){
+    if(rooks == 0){ return; }
 
-}
+    // Go through each rook and go through each move for each rook
+    for(uint8_t from = bitScanForward(rooks); rooks != 0; rooks &= (rooks -1)){
+        uint64_t moveSquares = rayAttacks(occupied, ROOK, from);
+        for(uint64_t attacks = moveSquares & occupied; attacks != 0; attacks &= (attacks - 1)){
+            Move m = createMove(from, bitScanForward(attacks), CAPTURE);
+            printMove(m);
+        }
 
-void genRookMoves(Color colr, board* b, Move* mvs){
-/**
-    while(pieces != 0){
-        uint64_t attacks = rayAttacks(
-        while(){
-
+        for(uint64_t quiets = moveSquares & ~occupied; quiets != 0; quiets &= (quiets - 1)){
+            Move m = createMove(from, bitScanForward(quiets), QUIET);
+            printMove(m);
         }
     }
-    
-**/
 }
 
-void genBishopMoves(){
+void genBishopMoves(uint64_t occupied, uint64_t bishops, Move* mvs){
 
 }
