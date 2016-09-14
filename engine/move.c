@@ -81,7 +81,22 @@ void genKingMoves(uint64_t occ, uint64_t opp, uint64_t king, Move* mvs){
 }
 
 void genQueenMoves(uint64_t occ, uint64_t opp, uint64_t queens, Move* mvs){
+    if(queens == 0){ return; }
 
+    // Go through each rook and go through each move for each rook
+    for(uint8_t from; queens != 0; queens &= (queens -1)){
+        from = bitScanForward(queens);
+        uint64_t moveSquares = rayAttacks(occ, QUEEN, from);
+        for(uint64_t attacks = moveSquares & opp; attacks != 0; attacks &= (attacks - 1)){
+            Move m = createMove(from, bitScanForward(attacks), CAPTURE);
+            printMove(m);
+        }
+
+        for(uint64_t quiets = moveSquares & ~occ; quiets != 0; quiets &= (quiets - 1)){
+            Move m = createMove(from, bitScanForward(quiets), QUIET);
+            printMove(m);
+        }
+    }
 }
 
 void genRookMoves(uint64_t occ, uint64_t opp, uint64_t rooks, Move* mvs){
@@ -105,5 +120,20 @@ void genRookMoves(uint64_t occ, uint64_t opp, uint64_t rooks, Move* mvs){
 }
 
 void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, Move* mvs){
+    if(bishops == 0){ return; }
 
+    // Go through each rook and go through each move for each rook
+    for(uint8_t from; bishops != 0; bishops &= (bishops -1)){
+        from = bitScanForward(bishops);
+        uint64_t moveSquares = rayAttacks(occ, BISHOP, from);
+        for(uint64_t attacks = moveSquares & opp; attacks != 0; attacks &= (attacks - 1)){
+            Move m = createMove(from, bitScanForward(attacks), CAPTURE);
+            printMove(m);
+        }
+
+        for(uint64_t quiets = moveSquares & ~occ; quiets != 0; quiets &= (quiets - 1)){
+            Move m = createMove(from, bitScanForward(quiets), QUIET);
+            printMove(m);
+        }
+    }
 }
