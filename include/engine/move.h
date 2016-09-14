@@ -12,5 +12,16 @@ uint64_t nwesOne( uint64_t bb );
 uint64_t seasOne( uint64_t bb );
 uint64_t swesOne( uint64_t bb );
 
+typedef uint16_t Move;
+
 uint64_t rayAttacks( uint64_t occ, Piece p, uint8_t sq );
+
+void createMove( uint8_t from, uint8_t to, uint8_t moveFlags, Move* mv );
+
+uint8_t getFrom(Move* mv);
+
+uint8_t getTo(Move* mv);
+
+uint8_t getMoveFlags(Move* mv);
+
 #endif
