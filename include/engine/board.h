@@ -30,5 +30,6 @@ uint8_t bitScanForward( uint64_t bb);
 
 const char *byteToBinary( char bt );
 void printBoard( uint64_t bb );
+void printBoardFull( board* b );
 
 #endif

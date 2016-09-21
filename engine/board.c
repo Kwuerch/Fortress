@@ -4,6 +4,7 @@
 
 #include "config.h"
 #include "board.h"
+#include "mask.h"
 
 static const uint8_t debruijn[64] = {
     0, 1, 48, 2, 57, 49, 28, 3,
@@ -59,4 +60,40 @@ void printBoard( uint64_t bb ){
    for(i = 56; i >= 0; i-=8){
       printf( "%s\n", byteToBinary( (char)( ( bb >> i ) & 0xff) ) );
    }
+}
+
+void printBoardFull( board* b){
+    for(int i = 63; i > -1; i--){
+        if(b -> bp & indxMask[i]){
+            printf( " ♙" );
+        }else if (b -> wp  & indxMask[i]) {
+            printf( " ♟" );
+        }else if (b -> br & indxMask[i]) {
+            printf( " ♖" );
+        }else if (b -> wr & indxMask[i]) {
+            printf( " ♜" );
+        }else if (b -> bn & indxMask[i]) {
+            printf( " ♘" );
+        }else if (b -> wn & indxMask[i]) {
+            printf( " ♞" );
+        }else if (b -> bh & indxMask[i]) {
+            printf( " ♗" );
+        }else if (b -> wh & indxMask[i]) {
+            printf( " ♝" );
+        }else if (b -> bq & indxMask[i]) {
+            printf( " ♕" );
+        }else if (b -> wq & indxMask[i]) {
+            printf( " ♛" );
+        }else if (b -> bk & indxMask[i]) {
+            printf( " ♔" );
+        }else if (b -> wk & indxMask[i]) {
+            printf( " ♚" );
+        }else{
+            printf( " ☐" );
+        }
+
+        if(i % 8 == 0){
+            printf( "\n" );
+        }
+    }
 }

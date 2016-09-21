@@ -17,6 +17,7 @@ void testMoveGen(){
     b.bk = 0x1000000000000000;
     b.bq = 0x0800000000000000;
 
+    printBoardFull(&b);
     moveList ml = genMoves(WHITE, &b);
     printMoves(&ml);
 }

@@ -54,19 +54,19 @@ moveList genMoves(Color colr, board* b){
     uint64_t wht = white(b);
     uint64_t blk = black(b);
     if(colr == WHITE){
-        genPawnMoves(occ, wht, b -> wp, ml);
-        genKnightMoves(occ, wht, b -> wn, ml);
-        genKingMoves(occ, wht, b -> wk, ml);
-        genQueenMoves(occ, wht, b -> wq, ml);
-        genRookMoves(occ, wht, b -> wr, ml);
-        genBishopMoves(occ, wht, b -> wh, ml);
+        genPawnMoves(occ, blk, b -> wp, ml);
+        genKnightMoves(occ, blk, b -> wn, ml);
+        genKingMoves(occ, blk, b -> wk, ml);
+        genQueenMoves(occ, blk, b -> wq, ml);
+        genRookMoves(occ, blk, b -> wr, ml);
+        genBishopMoves(occ, blk, b -> wh, ml);
     }else{
-        genPawnMoves(occ, blk, b -> bp, ml);
-        genKnightMoves(occ, blk, b -> bn, ml);
-        genKingMoves(occ, blk, b -> bk, ml);
-        genQueenMoves(occ, blk, b -> bq, ml);
-        genRookMoves(occ, blk, b -> br, ml);
-        genBishopMoves(occ, blk, b -> bh, ml);
+        genPawnMoves(occ, wht, b -> bp, ml);
+        genKnightMoves(occ, wht, b -> bn, ml);
+        genKingMoves(occ, wht, b -> bk, ml);
+        genQueenMoves(occ, wht, b -> bq, ml);
+        genRookMoves(occ, wht, b -> br, ml);
+        genBishopMoves(occ, wht, b -> bh, ml);
     }
 
     return *ml;
