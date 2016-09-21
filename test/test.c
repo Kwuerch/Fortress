@@ -1,5 +1,6 @@
 #include "move.h"
 #include "board.h"
+#include "moveList.h"
 
 void testMoveGen(){
     board b;
@@ -16,10 +17,6 @@ void testMoveGen(){
     b.bk = 0x1000000000000000;
     b.bq = 0x0800000000000000;
 
-    Move trash;
-    genRookMoves(occupied(&b), black(&b), b.wr, &trash);
-    genBishopMoves(occupied(&b), black(&b), b.wh, &trash);
-    genQueenMoves(occupied(&b), black(&b), b.wq, &trash);
-    genKingMoves(occupied(&b), black(&b), b.wk, &trash);
-    genKnightMoves(occupied(&b), black(&b), b.wn, &trash);
+    moveList ml = genMoves(WHITE, &b);
+    printMoves(&ml);
 }

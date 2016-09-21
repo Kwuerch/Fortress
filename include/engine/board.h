@@ -5,8 +5,7 @@
 
 #include <stdint.h>
 
-typedef struct board board;
-struct board{
+typedef struct board{
     uint64_t wp;
     uint64_t wr;
     uint64_t wn;
@@ -19,7 +18,7 @@ struct board{
     uint64_t bh;
     uint64_t bk;
     uint64_t bq;
-};
+}board;
 
 void initBoard( board *b);
 
