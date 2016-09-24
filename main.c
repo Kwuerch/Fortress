@@ -9,9 +9,6 @@
 int main(){
     initMasks();
 
-    board b;
-    initBoard(&b);
-
     /**
     printf("From: %i", i);
     printf(" To: %i\n", j);

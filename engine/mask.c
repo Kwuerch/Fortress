@@ -301,7 +301,6 @@ void initPieceMask() {
 }
 
 void initBlockersAndBeyond(){
-    // TODO could fix bab to be only [3][64]
     for(int i = 0; i < 64; i++ ){
         blBeMask[BISHOP][i] = piecMask[BISHOP][i] & babMask;
         blBeMask[ROOK][i] = (nortMask[i] & notRank8) | (eastMask[i] & notHFile) | (westMask[i] & notAFile) | (soutMask[i] & notRank1);

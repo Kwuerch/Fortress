@@ -18,5 +18,6 @@ typedef struct moveList {
 
 void addMove(moveList* ml, Move mv);
 void printMoves(moveList* ml);
+void freeMoveList(moveList* ml);
 
 #endif

@@ -32,3 +32,19 @@ void printMoves(moveList* ml){
         cur = cur -> next;
     }
 }
+
+void freeMoveList(moveList* ml){
+    if(ml -> head != NULL){
+        moveListNode* cur = ml -> head;
+
+        moveListNode* next; 
+
+        do{
+            next = cur -> next;
+            free(cur);
+            cur = next;
+        }while(cur != NULL);
+    }
+
+    free(ml);
+}

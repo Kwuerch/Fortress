@@ -47,7 +47,7 @@ void printMove(Move mv){
     printf("Flags:%i\n", getMoveFlags(mv));
 }
 
-moveList genMoves(Color colr, board* b){
+moveList* genMoves(Color colr, board* b){
     moveList* ml = malloc(sizeof(moveList));
 
     uint64_t occ = occupied(b);
@@ -69,7 +69,7 @@ moveList genMoves(Color colr, board* b){
         genBishopMoves(occ, wht, b -> bh, ml);
     }
 
-    return *ml;
+    return ml;
 }
 
 void genPawnMoves(uint64_t occ, uint64_t opp, uint64_t pawns, moveList* ml){

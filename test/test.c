@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "move.h"
 #include "board.h"
 #include "moveList.h"
@@ -18,6 +19,8 @@ void testMoveGen(){
     b.bq = 0x0800000000000000;
 
     printBoardFull(&b);
-    moveList ml = genMoves(WHITE, &b);
-    printMoves(&ml);
+    moveList* ml = genMoves(WHITE, &b);
+    printMoves(ml);
+
+    freeMoveList(ml);
 }
