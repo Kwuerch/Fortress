@@ -6,6 +6,7 @@
 #include "board.h"
 #include "mask.h"
 
+// Debruijn hash map
 static const uint8_t debruijn[64] = {
     0, 1, 48, 2, 57, 49, 28, 3,
     61, 58, 50, 42, 38, 29, 17, 4,
@@ -37,12 +38,24 @@ uint64_t white( board* b ) { return b->wp | b->wr | b->wn | b->wh | b->wk | b->w
 
 uint64_t occupied( board* b ){ return black(b) | white(b); }
 
-// bb cannot be zero
+/**
+ * bitScanForward
+ *
+ * Returns the index of the first
+ * bit == 1
+ *
+ * Precondition: bb != 0
+ */
 uint8_t bitScanForward( uint64_t bb){
     return debruijn[((bb & (~bb + 1)) * DEBRUIJN_CONST) >> 58];
-    // TODO faster return debruijn[((bb ^ (bb - 1)) * DEBRUIJN_CONST) >> 58];
 }
 
+/**
+ * byteToBinary
+ *
+ * Returns an array of characters containing
+ * the binary representation of a byte
+ */
 const char *byteToBinary( char bt ){
    static char b[9];
    b[0] = '\0';
