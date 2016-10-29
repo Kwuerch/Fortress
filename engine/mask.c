@@ -18,7 +18,8 @@ uint64_t seasMask[64];
 uint64_t diagMask[64];
 uint64_t adiaMask[64];
 
-uint64_t piecMask[6][64];
+uint64_t piecMask[5][64];
+uint64_t pawnMask[2][5][64];
 uint64_t blBeMask[3][64];
 
 uint64_t indxMask[64];
@@ -127,6 +128,26 @@ void initAdiaMask(){
     }
 }
 
+void initPawnMask(){
+    for(int i = 0; i < 64; i++){
+        uint64_t index = indxMask[i];
+
+        pawnMask[WHITE][PUSH][i]   |= nortOne(index) & notRank8;
+        pawnMask[BLACK][PUSH][i]   |= soutOne(index) & notRank1;
+
+        pawnMask[WHITE][DOUBLE_PUSH][i]   |= nortOne(nortOne(index)) & rank4;
+        pawnMask[BLACK][DOUBLE_PUSH][i]   |= soutOne(soutOne(index)) & rank5;
+
+        pawnMask[WHITE][CAP][i] |= (neasOne(index) | nwesOne(index)) & notRank8;
+        pawnMask[BLACK][CAP][i] |= (soutOne(index) | soutOne(index)) & notRank1;
+
+        pawnMask[WHITE][PROMO_CAP][i] |= (neasOne(index) | nwesOne(index)) & rank8;
+        pawnMask[BLACK][PROMO_CAP][i] |= (soutOne(index) | soutOne(index)) & rank1;
+
+        pawnMask[WHITE][PROMO][i]  |= nortOne(index) & rank8;
+        pawnMask[BLACK][PROMO][i]  |= soutOne(index) & rank1;
+    }
+}
 
 void initKngtMask(){
     for(int i = 0; i < 64; i++){
@@ -288,14 +309,15 @@ void initShadowMask(){
 }
 
 
+/** Mask for pseudo-legal possible moves ** ONLY ATTACK MOVES FOR PAWN **/
 void initPieceMask() { 
     for(int i = 0; i < 64; i++ ){
-        piecMask[PAWN][i] = 0;
         piecMask[ROOK][i] = westMask[i] | eastMask[i] | nortMask[i] | soutMask[i];
         piecMask[BISHOP][i] = diagMask[i] | adiaMask[i];
         piecMask[QUEEN][i] = piecMask[ROOK][i] | piecMask[BISHOP][i];
     }
 
+    initPawnMask();
     initKngtMask();
     initKingMask();
 }

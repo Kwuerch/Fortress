@@ -14,7 +14,8 @@ extern uint64_t seasMask[64];
 extern uint64_t diagMask[64];
 extern uint64_t adiaMask[64];
 
-extern uint64_t piecMask[6][64];
+extern uint64_t piecMask[5][64];
+extern uint64_t pawnMask[2][5][64];
 extern uint64_t blBeMask[3][64];
 
 extern uint64_t indxMask[64];
@@ -32,7 +33,9 @@ void initSeasMask();
 void initSwesMask();
 void initDiagMask();
 void initAdiaMask();
+void initPawnMask();
 void initKngtMask();
+void initKingMask();
 void initFromTo();
 void initShadowMask();
 void initPieceMask();
