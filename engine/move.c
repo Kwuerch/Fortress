@@ -54,14 +54,14 @@ moveList* genMoves(Color colr, board* b){
     uint64_t wht = white(b);
     uint64_t blk = black(b);
     if(colr == WHITE){
-        genPawnMoves(occ, blk, b -> wp, ml);
+        genPawnMoves(colr, occ, blk, b -> wp, ml);
         genKnightMoves(occ, blk, b -> wn, ml);
         genKingMoves(occ, blk, b -> wk, ml);
         genQueenMoves(occ, blk, b -> wq, ml);
         genRookMoves(occ, blk, b -> wr, ml);
         genBishopMoves(occ, blk, b -> wh, ml);
     }else{
-        genPawnMoves(occ, wht, b -> bp, ml);
+        genPawnMoves(colr, occ, wht, b -> bp, ml);
         genKnightMoves(occ, wht, b -> bn, ml);
         genKingMoves(occ, wht, b -> bk, ml);
         genQueenMoves(occ, wht, b -> bq, ml);
@@ -72,7 +72,46 @@ moveList* genMoves(Color colr, board* b){
     return ml;
 }
 
-void genPawnMoves(uint64_t occ, uint64_t opp, uint64_t pawns, moveList* ml){
+void genPawnMoves(Color c, uint64_t occ, uint64_t opp, uint64_t pawns, moveList* ml){
+    if(pawns == 0){ return; }
+
+    // Go through each pawn and append each individual's moves 
+    for(uint8_t from; pawns != 0; pawns &= (pawns -1)){
+        from = bitScanForward(pawns);
+
+        for(uint64_t attacks = pawnMask[c][CAP][from] & opp; attacks != 0; attacks &= (attacks - 1)){
+            addMove(ml,  createMove(from, bitScanForward(attacks), CAPTURE));
+        }
+
+        // Single Push
+        for(uint64_t sPushes = pawnMask[c][PUSH][from] & ~occ; sPushes != 0; sPushes &= (sPushes - 1)){
+            addMove(ml, createMove(from, bitScanForward(sPushes), QUIET));
+        }
+
+        // Double Push
+        for(uint64_t dPushes = pawnMask[c][DOUBLE_PUSH][from] & ~occ; dPushes != 0; dPushes &= (dPushes - 1)){
+            addMove(ml, createMove(from, bitScanForward(dPushes), DOUBLE_PAWN));
+        }
+
+        // Promos 
+        for(uint64_t promos = pawnMask[c][PROMO][from] & ~occ; promos != 0; promos &= (promos - 1)){
+            int proSq = bitScanForward(promos);
+            addMove(ml, createMove(from, proSq, KNIGHT_PROMO));
+            addMove(ml, createMove(from, proSq, BISHOP_PROMO));
+            addMove(ml, createMove(from, proSq, ROOK_PROMO));
+            addMove(ml, createMove(from, proSq, QUEEN_PROMO));
+        }
+
+        // Promo Captures 
+        for(uint64_t promoCaps = pawnMask[c][PROMO_CAP][from] & opp; promoCaps != 0; promoCaps &= (promoCaps - 1)){
+            int proSq = bitScanForward(promoCaps);
+            addMove(ml, createMove(from, proSq, KNIGHT_PROMO_CAP));
+            addMove(ml, createMove(from, proSq, BISHOP_PROMO_CAP));
+            addMove(ml, createMove(from, proSq, ROOK_PROMO_CAP));
+            addMove(ml, createMove(from, proSq, QUEEN_PROMO_CAP));
+        }
+
+    }
 
 }
 

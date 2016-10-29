@@ -29,7 +29,7 @@ uint8_t getTo(Move mv);
 uint8_t getMoveFlags(Move mv);
 
 moveList* genMoves(Color colr, board* b);
-void genPawnMoves(uint64_t occ, uint64_t opp, uint64_t pawns, moveList* mvs);
+void genPawnMoves(Color colr, uint64_t occ, uint64_t opp, uint64_t pawns, moveList* mvs);
 void genKnightMoves(uint64_t occ, uint64_t opp, uint64_t knights, moveList* mvs);
 void genKingMoves(uint64_t occ, uint64_t opp, uint64_t king, moveList* mvs);
 void genQueenMoves(uint64_t occ, uint64_t opp, uint64_t queens, moveList* mvs);
