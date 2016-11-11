@@ -9,6 +9,8 @@
 int main(){
     initMasks();
 
+    
+
     /**
     printf("From: %i", i);
     printf(" To: %i\n", j);
@@ -42,7 +44,10 @@ int main(){
     //Move m = createMove(63, 12, 3);
     //printMove(m);
     
-    testMoveGen();
+    //testMoveGen();
+    testMoveMake();
+
+
 
     return 0;
 }

@@ -197,3 +197,115 @@ void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, moveList* ml){
         }
     }
 }
+
+void makeMove(Color c, board * b, Move m){
+    uint64_t from = indxMask[getFrom(m)];
+    uint64_t to = indxMask[getTo(m)];
+
+    uint64_t *fromBoard;
+    uint64_t *toBoard;
+
+    // Determine which piece is moving, and to where
+    if(c == WHITE){
+        if(b -> wp & from){
+            fromBoard = &(b -> wp);
+        }else if(b -> wr & from){
+            fromBoard = &(b -> wr);
+        }else if(b -> wn & from){
+            fromBoard = &(b -> wn);
+        }else if(b -> wh & from){
+            fromBoard = &(b -> wh);
+        }else if(b -> wq & from){
+            fromBoard = &(b -> wq);
+        }else if(b -> wk & from){
+            fromBoard = &(b -> wk);
+        }
+
+        if(b -> bp & from){
+            toBoard = &(b -> bp);
+        }else if(b -> br & from){
+            toBoard = &(b -> br);
+        }else if(b -> bn & from){
+            toBoard = &(b -> bn);
+        }else if(b -> bh & from){
+            toBoard = &(b -> bh);
+        }else if(b -> bq & from){
+            toBoard = &(b -> bq);
+        }else if(b -> bk & from){
+            toBoard = &(b -> bk);
+        }
+
+    }else{ // c == BLACK
+        if(b -> bp & from){
+            fromBoard = &(b -> bp);
+        }else if(b -> br & from){
+            fromBoard = &(b -> br);
+        }else if(b -> bn & from){
+            fromBoard = &(b -> bn);
+        }else if(b -> bh & from){
+            fromBoard = &(b -> bh);
+        }else if(b -> bq & from){
+            fromBoard = &(b -> bq);
+        }else if(b -> bk & from){
+            fromBoard = &(b -> bk);
+        }
+
+        if(b -> wp & from){
+            toBoard = &(b -> wp);
+        }else if(b -> wr & from){
+            toBoard = &(b -> wr);
+        }else if(b -> wn & from){
+            toBoard = &(b -> wn);
+        }else if(b -> wh & from){
+            toBoard = &(b -> wh);
+        }else if(b -> wq & from){
+            toBoard = &(b -> wq);
+        }else if(b -> wk & from){
+            toBoard = &(b -> wk);
+        }
+    }
+
+    uint8_t flags = getMoveFlags(m);
+    switch(flags){
+        case QUIET:
+            *fromBoard &= ~from;
+            *fromBoard |= to;
+            break;
+        case DOUBLE_PAWN:
+            *fromBoard &= ~from;
+            *fromBoard |= to;
+            break;
+        case KING_CASTLE:
+            break;
+        case QUEEN_CASTLE:
+            break;
+        case CAPTURE:
+            *fromBoard &= ~from;
+            *fromBoard |= to;
+            *toBoard   &= ~to;
+            break;
+        case EP_CAPTURE:
+            break;
+        case KNIGHT_PROMO:
+            break;
+        case BISHOP_PROMO:
+            break;
+        case ROOK_PROMO:
+            break;
+        case QUEEN_PROMO:
+            break;
+        case KNIGHT_PROMO_CAP:
+            break;
+        case BISHOP_PROMO_CAP:
+            break;
+        case ROOK_PROMO_CAP:
+            break;
+        case QUEEN_PROMO_CAP:
+            break;
+    }
+
+}
+
+void undoMove(moveList m){
+
+}

@@ -2,5 +2,6 @@
 #define TEST_H_INCLUDED
 
 void testMoveGen();
+void testMoveMake();
 
 #endif
