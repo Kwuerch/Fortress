@@ -7,6 +7,10 @@
 #include "board.h"
 #include "mask.h"
 #include "moveList.h"
+#include "moveStack.h"
+
+static uint64_t *getFromBoard(board*, Color, Move);
+static uint64_t *getToBoard(board*, Color, Move);
 
 uint64_t nortOne( uint64_t bb ) { return bb << 8; }
 uint64_t soutOne( uint64_t bb ) { return bb >> 8; }
@@ -49,6 +53,8 @@ void printMove(Move mv){
 
 moveList* genMoves(Color colr, board* b){
     moveList* ml = malloc(sizeof(moveList));
+    ml -> head = NULL;
+    ml -> tail = NULL;
 
     uint64_t occ = occupied(b);
     uint64_t wht = white(b);
@@ -198,74 +204,17 @@ void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, moveList* ml){
     }
 }
 
-void makeMove(Color c, board * b, Move m){
+void makeMove(Color c, board * b, Move m, moveStack *stk){
     uint64_t from = indxMask[getFrom(m)];
     uint64_t to = indxMask[getTo(m)];
 
-    uint64_t *fromBoard;
-    uint64_t *toBoard;
+    uint64_t *fromBoard = getFromBoard(b, c, m);
 
-    // Determine which piece is moving, and to where
-    if(c == WHITE){
-        if(b -> wp & from){
-            fromBoard = &(b -> wp);
-        }else if(b -> wr & from){
-            fromBoard = &(b -> wr);
-        }else if(b -> wn & from){
-            fromBoard = &(b -> wn);
-        }else if(b -> wh & from){
-            fromBoard = &(b -> wh);
-        }else if(b -> wq & from){
-            fromBoard = &(b -> wq);
-        }else if(b -> wk & from){
-            fromBoard = &(b -> wk);
-        }
-
-        if(b -> bp & from){
-            toBoard = &(b -> bp);
-        }else if(b -> br & from){
-            toBoard = &(b -> br);
-        }else if(b -> bn & from){
-            toBoard = &(b -> bn);
-        }else if(b -> bh & from){
-            toBoard = &(b -> bh);
-        }else if(b -> bq & from){
-            toBoard = &(b -> bq);
-        }else if(b -> bk & from){
-            toBoard = &(b -> bk);
-        }
-
-    }else{ // c == BLACK
-        if(b -> bp & from){
-            fromBoard = &(b -> bp);
-        }else if(b -> br & from){
-            fromBoard = &(b -> br);
-        }else if(b -> bn & from){
-            fromBoard = &(b -> bn);
-        }else if(b -> bh & from){
-            fromBoard = &(b -> bh);
-        }else if(b -> bq & from){
-            fromBoard = &(b -> bq);
-        }else if(b -> bk & from){
-            fromBoard = &(b -> bk);
-        }
-
-        if(b -> wp & from){
-            toBoard = &(b -> wp);
-        }else if(b -> wr & from){
-            toBoard = &(b -> wr);
-        }else if(b -> wn & from){
-            toBoard = &(b -> wn);
-        }else if(b -> wh & from){
-            toBoard = &(b -> wh);
-        }else if(b -> wq & from){
-            toBoard = &(b -> wq);
-        }else if(b -> wk & from){
-            toBoard = &(b -> wk);
-        }
-    }
+    // Could send stackMove pointer in to get modified and have the captured piece added
+    uint64_t *toBoard = getToBoard(b, c, m);
 
     uint8_t flags = getMoveFlags(m);
+
     switch(flags){
         case QUIET:
             *fromBoard &= ~from;
@@ -304,8 +253,135 @@ void makeMove(Color c, board * b, Move m){
             break;
     }
 
+    //TODO -- .capture is not included in stackmove
+    stackMove sm = {.mv = m, .clr = c}; 
+
+    push(stk, sm);
 }
 
-void undoMove(moveList m){
+// Unmakes the most recent move on the stack
+void unmakeMove(board *b, moveStack *stk){
+    stackMove last = pop(stk);
 
+    uint64_t from = indxMask[getFrom(last.mv)];
+    uint64_t to = indxMask[getTo(last.mv)];
+
+    uint64_t *fromBoard = getFromBoard(b, last.clr, last.mv);
+
+    // TODO -- This seems a bit round about, is there a better way to do this?
+    // Switching colors, since toBoard checks for captured of opposite color
+    uint64_t *toBoard = getToBoard(b, last.clr == WHITE ? BLACK : WHITE, last.mv);
+
+    uint8_t flags = getMoveFlags(last.mv);
+
+    // To and from are reversed from makeMove funtion
+    switch(flags){
+        case QUIET:
+            *toBoard &= ~to;
+            *toBoard |= from;
+            break;
+        case DOUBLE_PAWN:
+            *toBoard &= ~to;
+            *toBoard |= from;
+            break;
+        case KING_CASTLE:
+            break;
+        case QUEEN_CASTLE:
+            break;
+        case CAPTURE:
+            //TODO implement
+            break;
+        case EP_CAPTURE:
+            break;
+        case KNIGHT_PROMO:
+            break;
+        case BISHOP_PROMO:
+            break;
+        case ROOK_PROMO:
+            break;
+        case QUEEN_PROMO:
+            break;
+        case KNIGHT_PROMO_CAP:
+            break;
+        case BISHOP_PROMO_CAP:
+            break;
+        case ROOK_PROMO_CAP:
+            break;
+        case QUEEN_PROMO_CAP:
+            break;
+    }
+}
+
+static uint64_t* getFromBoard(board *b, Color c, Move mv){
+    uint64_t from = indxMask[getFrom(mv)];
+    uint64_t *fromBoard;
+
+    if(c == WHITE){
+        if(b -> wp & from){
+            fromBoard = &(b -> wp);
+        }else if(b -> wr & from){
+            fromBoard = &(b -> wr);
+        }else if(b -> wn & from){
+            fromBoard = &(b -> wn);
+        }else if(b -> wh & from){
+            fromBoard = &(b -> wh);
+        }else if(b -> wq & from){
+            fromBoard = &(b -> wq);
+        }else if(b -> wk & from){
+            fromBoard = &(b -> wk);
+        }
+    }else{ // c == BLACK
+        if(b -> bp & from){
+            fromBoard = &(b -> bp);
+        }else if(b -> br & from){
+            fromBoard = &(b -> br);
+        }else if(b -> bn & from){
+            fromBoard = &(b -> bn);
+        }else if(b -> bh & from){
+            fromBoard = &(b -> bh);
+        }else if(b -> bq & from){
+            fromBoard = &(b -> bq);
+        }else if(b -> bk & from){
+            fromBoard = &(b -> bk);
+        }
+    }
+
+    return fromBoard;
+}
+
+static uint64_t* getToBoard(board *b, Color c, Move mv){
+    uint64_t to = indxMask[getTo(mv)];
+    uint64_t* toBoard;
+
+    if(c == WHITE){
+        if(b -> bp & to){
+            toBoard = &(b -> bp);
+        }else if(b -> br & to){
+            toBoard = &(b -> br);
+        }else if(b -> bn & to){
+            toBoard = &(b -> bn);
+        }else if(b -> bh & to){
+            toBoard = &(b -> bh);
+        }else if(b -> bq & to){
+            toBoard = &(b -> bq);
+        }else if(b -> bk & to){
+            toBoard = &(b -> bk);
+        }
+    }else{ // c == BLACK
+        if(b -> wp & to){
+            toBoard = &(b -> wp);
+        }else if(b -> wr & to){
+            toBoard = &(b -> wr);
+        }else if(b -> wn & to){
+            toBoard = &(b -> wn);
+        }else if(b -> wh & to){
+            toBoard = &(b -> wh);
+        }else if(b -> wq & to){
+            toBoard = &(b -> wq);
+        }else if(b -> wk & to){
+            toBoard = &(b -> wk);
+        }
+    }
+
+    return toBoard;
 }

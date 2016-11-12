@@ -4,6 +4,7 @@
 #include "config.h"
 #include "board.h"
 #include "moveList.h"
+#include "moveStack.h"
 #include <stdint.h>
 
 /**--------------------------------------------------------------*\
@@ -12,7 +13,6 @@
  *---------------------------------------------------------------*/
 
 typedef uint16_t Move;
- 
 
 uint64_t nortOne( uint64_t bb );
 uint64_t soutOne( uint64_t bb );
@@ -44,6 +44,7 @@ void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, moveList* mvs)
 
 void printMove(Move m);
 
-void makeMove(Color c, board * b, Move m);
+void makeMove(Color c, board * b, Move m, moveStack *ms);
+void unmakeMove(board *b, moveStack *ms);
 
 #endif

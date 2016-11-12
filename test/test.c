@@ -3,6 +3,7 @@
 #include "move.h"
 #include "board.h"
 #include "moveList.h"
+#include "moveStack.h"
 
 void testMoveGen(){
     board b;
@@ -50,21 +51,25 @@ void testMoveMake(){
 
     printBoardFull(&b);
 
+    moveStack *ms = malloc(sizeof(moveStack));
+
     printf("%s\n", "White Moves:");
-    moveList* ml = genMoves(WHITE, &b);
+    moveList *ml = genMoves(WHITE, &b);
 
     moveListNode* cur = ml -> head;
 
     while(cur != NULL){
         printMove(cur -> mv);
 
-        makeMove(WHITE, &b, cur -> mv);
+        makeMove(WHITE, &b, cur -> mv, ms);
         printBoardFull(&b);
+        unmakeMove(&b, ms);
 
         cur = cur -> next;
     }
 
 
+    /**
     printf("%s\n", "Black Moves:");
     ml = genMoves(BLACK, &b);
 
@@ -78,7 +83,9 @@ void testMoveMake(){
 
         cur = cur -> next;
     }
+    **/
 
     freeMoveList(ml);
+    freeMoveStack(ms);
 
 }
