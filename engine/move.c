@@ -140,7 +140,7 @@ void genKnightMoves(uint64_t occ, uint64_t opp, uint64_t knights, moveList* ml){
 void genKingMoves(uint64_t occ, uint64_t opp, uint64_t king, moveList* ml){
     if(king == 0){ return; }
 
-    // Go through each knight and append each individual's moves 
+    // Go through each king and append each individual's moves 
     for(uint8_t from; king != 0; king &= (king -1)){
         from = bitScanForward(king);
         for(uint64_t attacks = piecMask[KING][from] & opp; attacks != 0; attacks &= (attacks - 1)){
