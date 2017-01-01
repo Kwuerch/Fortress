@@ -204,6 +204,24 @@ void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, moveList* ml){
     }
 }
 
+bool isMoveValid(Move move){
+    if(getPiece(move) == KING){
+        return isKingMoveValid(move);
+    }
+}
+
+bool isKingMoveValid(Move move){
+    // Check if pawn, queen, rook, king, queen, or bishop can attack that square
+    // ....
+    // ....
+    // ....
+    // And Full Diagonal Rays of (move to) with opponent bishops queens -- for each piece in the ray, If( (to from) & occupied == 0 ) ) -> Move is invalid
+    // And Full Horizontal and Vertical rays of (move to) with opponent rook and queens -- Then do same as above
+    // And Single Diagonal Rays of (move to) with opponent pawn and king -- If resulting board != 0 -> Move is invalid
+    // And Single Horizontal an Vertical Rays of (move to) with opponent
+    
+}
+
 void makeMove(Color c, board * b, Move m, moveStack *stk){
     uint64_t from = indxMask[getFrom(m)];
     uint64_t to = indxMask[getTo(m)];
