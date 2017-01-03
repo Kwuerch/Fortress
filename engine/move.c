@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "config.h"
 #include "move.h"
@@ -9,8 +10,9 @@
 #include "moveList.h"
 #include "moveStack.h"
 
-static uint64_t *getFromBoard(board*, Color, Move);
-static uint64_t *getToBoard(board*, Color, Move);
+static bool      isKingMoveValid(board *b, Color c, Move m);
+static uint64_t *getFromBoard(board *b, Color c, Move m);
+static uint64_t *getToBoard(board *b, Color c, Move m);
 
 uint64_t nortOne( uint64_t bb ) { return bb << 8; }
 uint64_t soutOne( uint64_t bb ) { return bb >> 8; }
@@ -204,22 +206,84 @@ void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, moveList* ml){
     }
 }
 
-bool isMoveValid(Move move){
-    if(getPiece(move) == KING){
-        return isKingMoveValid(move);
-    }
-}
+bool isKingMoveValid(board *b, Color c, Move m){
 
-bool isKingMoveValid(Move move){
-    // Check if pawn, queen, rook, king, queen, or bishop can attack that square
-    // ....
-    // ....
-    // ....
-    // And Full Diagonal Rays of (move to) with opponent bishops queens -- for each piece in the ray, If( (to from) & occupied == 0 ) ) -> Move is invalid
-    // And Full Horizontal and Vertical rays of (move to) with opponent rook and queens -- Then do same as above
-    // And Single Diagonal Rays of (move to) with opponent pawn and king -- If resulting board != 0 -> Move is invalid
-    // And Single Horizontal an Vertical Rays of (move to) with opponent
+    uint8_t to = getTo(m);
+    uint64_t occ = occupied(b);
+
+
+    // Check if desired move location is under control of the opponent
+    if(c == WHITE){
+        // Check Full Diagonal Rays for desired move location
+        for( uint64_t attackers = piecMask[BISHOP][to] & (b -> bq | b -> bh);
+                attackers != 0; attackers &= (attackers - 1)){
+            
+
+            if((fromToMask[to][bitScanForward(attackers)] & occ) == 0 ){
+                return false;
+            }
+        }
     
+
+        // Check Full Horizontal and Vertical Rays for desired move location 
+        for( uint64_t attackers = piecMask[ROOK][to] & (b -> bq | b -> br);
+                attackers != 0; attackers &= (attackers - 1)){
+            
+
+            if((fromToMask[to][bitScanForward(attackers)] & occ) == 0 ){
+                return false;
+            }
+        }
+
+        // Check Single Rays except attacking pawn locations for desired move
+        if((nortMask[to] | soutMask[to] | eastMask[to] | westMask[to] | 
+                swesMask[to] | seasMask[to] & b -> bk) != 0){ 
+
+            return false; 
+        }
+
+        // Check Single Rays of attacking pawn locations for desired move
+        if((neasMask[to] | nwesMask[to] & (b -> bk | b -> bp)) != 0){
+            return false;
+        }
+
+    }else{ // c == BLACK
+        // Check Full Diagonal Rays for desired move location
+        for( uint64_t attackers = piecMask[BISHOP][to] & (b -> wq | b -> wh);
+                attackers != 0; attackers &= (attackers - 1)){
+            
+
+            if((fromToMask[to][bitScanForward(attackers)] & occ) == 0 ){
+                return false;
+            }
+        }
+    
+
+        // Check Full Horizontal and Vertical Rays for desired move location 
+        for( uint64_t attackers = piecMask[ROOK][to] & (b -> wq | b -> wr);
+                attackers != 0; attackers &= (attackers - 1)){
+            
+
+            if((fromToMask[to][bitScanForward(attackers)] & occ) == 0 ){
+                return false;
+            }
+        }
+
+        // Check Single Rays except attacking pawn locations for desired move
+        if((nortMask[to] | soutMask[to] | eastMask[to] | westMask[to] | 
+                nwesMask[to] | neasMask[to] & b -> wk) != 0){ 
+
+            return false; 
+        }
+
+        // Check Single Rays of attacking pawn locations for desired move
+        if((seasMask[to] | swesMask[to] & (b -> wk | b -> wp)) != 0){
+            return false;
+        }
+
+    }
+
+    return true;
 }
 
 void makeMove(Color c, board * b, Move m, moveStack *stk){

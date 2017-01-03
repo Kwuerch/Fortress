@@ -33,10 +33,10 @@ void initBoard( board* b){
     b -> bq = 0x0800000000000000;
 }
 
-uint64_t black( board* b ) { return b->bp | b->br | b->bn | b->bh | b->bk | b->bq; }
-uint64_t white( board* b ) { return b->wp | b->wr | b->wn | b->wh | b->wk | b->wq; }
+uint64_t black( board *b ) { return b->bp | b->br | b->bn | b->bh | b->bk | b->bq; }
+uint64_t white( board *b ) { return b->wp | b->wr | b->wn | b->wh | b->wk | b->wq; }
 
-uint64_t occupied( board* b ){ return black(b) | white(b); }
+uint64_t occupied( board *b ){ return black(b) | white(b); }
 
 /**
  * bitScanForward
@@ -46,7 +46,7 @@ uint64_t occupied( board* b ){ return black(b) | white(b); }
  *
  * Precondition: bb != 0
  */
-uint8_t bitScanForward( uint64_t bb){
+uint8_t bitScanForward( uint64_t bb ){
     return debruijn[((bb & (~bb + 1)) * DEBRUIJN_CONST) >> 58];
 }
 
