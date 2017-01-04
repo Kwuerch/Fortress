@@ -1,7 +1,6 @@
 #ifndef TEST_H_INCLUDED
 #define TEST_H_INCLUDED
 
-void testMoveGen();
-void testMoveMake();
+void runTests();
 
 #endif

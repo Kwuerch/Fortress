@@ -53,33 +53,33 @@ void initNortMask(){
    }
 }
 
-void initEastMask(){
-   uint64_t eastRay = 0x00000000000000fe;
+void initWestMask(){
+   uint64_t westRay = 0x00000000000000fe;
    uint64_t loopRay;
    int i; 
    int j;
    for( int i = 0; i < 8; i++){
-      loopRay = eastRay;
-      for( int j = i; j < 64; j+=8){
-         eastMask[j] = loopRay; 
-         loopRay = nortOne(loopRay);
-      }
-      eastRay = eastOne(eastRay);
-   }
-}
-
-void initWestMask(){
-   uint64_t westRay = 0x000000000000007f;
-   uint64_t loopRay;
-   int i; 
-   int j;
-   for( int i = 7; i > -1; i--){
       loopRay = westRay;
       for( int j = i; j < 64; j+=8){
          westMask[j] = loopRay; 
          loopRay = nortOne(loopRay);
       }
       westRay = westOne(westRay);
+   }
+}
+
+void initEastMask(){
+   uint64_t eastRay = 0x000000000000007f;
+   uint64_t loopRay;
+   int i; 
+   int j;
+   for( int i = 7; i > -1; i--){
+      loopRay = eastRay;
+      for( int j = i; j < 64; j+=8){
+         eastMask[j] = loopRay; 
+         loopRay = nortOne(loopRay);
+      }
+      eastRay = eastOne(eastRay);
    }
 }
 
@@ -170,68 +170,61 @@ void initKingMask(){
 
 void initFromTo(){
    for(int i = 0; i < 64; i++){
-      uint64_t bb = indxMask[i];
 
-      for(int j = i + 8; j < 64; j += 8){
+      uint64_t bb = indxMask[i];
+      for(int j = i + 16; j < 64; j += 8){
          bb |= nortOne(bb);
          fromToMask[i][j] = bb ^ indxMask[i];
       }
 
       bb = indxMask[i];
-
-      for(int j = i - 8; j > -1; j -= 8){
+      for(int j = i - 16; j > -1; j -= 8){
          bb |= soutOne(bb);
          fromToMask[i][j] = bb ^ indxMask[i];
       }
 
       bb = indxMask[i];
-      
-      int eastBound = (i/8) * 8 + 8;
-      for(int j = i + 1; j < eastBound; j += 1){
-         bb |= eastOne(bb);
-         fromToMask[i][j] = bb ^ indxMask[i];
-      }
-
-      bb = indxMask[i];
-
-      int westBound = (i/8) * 8 - 1;
-      for(int j = i - 1; j > westBound; j -= 1){
+      int westBound = (i/8) * 8 + 8;
+      for(int j = i + 2; j < westBound; j += 1){
          bb |= westOne(bb);
          fromToMask[i][j] = bb ^ indxMask[i];
       }
 
       bb = indxMask[i];
+      int eastBound = (i/8) * 8 - 1;
+      for(int j = i - 2; j > eastBound; j -= 1){
+         bb |= eastOne(bb);
+         fromToMask[i][j] = bb ^ indxMask[i];
+      }
 
-      int j = i + 9;
-      while(j < 64 && neasOne(indxMask[j-9])){
-         bb |= neasOne(bb);
+      bb = indxMask[i];
+      int j = i + 18;
+      while(j < 64 && nwesOne(indxMask[j-9])){
+         bb |= nwesOne(bb);
          fromToMask[i][j] = bb ^ indxMask[i];
          j += 9;
       }
 
       bb = indxMask[i];
-
-      j = i - 9;
-      while(j > 0 && swesOne(indxMask[j + 9])){
-         bb |= swesOne(bb);
+      j = i - 18;
+      while(j > 0 && seasOne(indxMask[j + 9])){
+         bb |= seasOne(bb);
          fromToMask[i][j] = bb ^ indxMask[i];
          j -= 9;
       }
 
       bb = indxMask[i];
-
-      j = i + 7;
-      while(j > 0 && nwesOne(indxMask[j - 7])){
-         bb |= nwesOne(bb);
+      j = i + 14;
+      while(j > 0 && neasOne(indxMask[j - 7])){
+         bb |= neasOne(bb);
          fromToMask[i][j] = bb ^ indxMask[i];
          j += 7;
       }
 
       bb = indxMask[i];
-
-      j = i - 7;
-      while(j > 0 && seasOne(indxMask[j + 7])){
-         bb |= seasOne(bb);
+      j = i - 14;
+      while(j > 0 && swesOne(indxMask[j + 7])){
+         bb |= swesOne(bb);
          fromToMask[i][j] = bb ^ indxMask[i];
          j -= 7;
       }
@@ -240,68 +233,61 @@ void initFromTo(){
 
 void initShadowMask(){
    for(int i = 0; i < 64; i++){
-      uint64_t bb = nortMask[i];
 
+      uint64_t bb = nortMask[i];
       for(int j = i + 8; j < 64; j += 8){
-         bb &= nortOne(bb);
+         bb = nortOne(bb);
          shadMask[i][j] = bb;
       }
 
       bb = soutMask[i];
-
       for(int j = i - 8; j > -1; j -= 8){
-         bb &= soutOne(bb);
-         shadMask[i][j] = bb;
-      }
-
-      bb = eastMask[i];
-      
-      int eastBound = (i/8) * 8 + 8;
-      for(int j = i + 1; j < eastBound; j += 1){
-         bb &= eastOne(bb);
+         bb = soutOne(bb);
          shadMask[i][j] = bb;
       }
 
       bb = westMask[i];
-
-      int westBound = (i/8) * 8 - 1;
-      for(int j = i - 1; j > westBound; j -= 1){
+      int westBound = (i/8) * 8 + 8;
+      for(int j = i + 1; j < westBound; j += 1){
          bb &= westOne(bb);
          shadMask[i][j] = bb;
       }
 
-      bb = neasMask[i];
+      bb = eastMask[i];
+      int eastBound = (i/8) * 8 - 1;
+      for(int j = i - 1; j > eastBound; j -= 1){
+         bb &= eastOne(bb);
+         shadMask[i][j] = bb;
+      }
 
+      bb = nwesMask[i];
       int j = i + 9;
-      while(j < 64 && neasOne(indxMask[j-9])){
-         bb &= neasOne(bb);
+      while(j < 64 && nwesOne(indxMask[j-9])){
+         bb &= nwesOne(bb);
          shadMask[i][j] = bb;
          j += 9;
       }
 
-      bb = swesMask[i];
-
+      bb = seasMask[i];
       j = i - 9;
-      while(j > 0 && swesOne(indxMask[j + 9])){
-         bb &= swesOne(bb);
+      while(j > 0 && seasOne(indxMask[j + 9])){
+         bb &= seasOne(bb);
          shadMask[i][j] = bb;
          j -= 9;
       }
 
-      bb = nwesMask[i];
-
+      bb = neasMask[i];
       j = i + 7;
-      while(j > 0 && nwesOne(indxMask[j - 7])){
-         bb &= nwesOne(bb);
+      while(j > 0 && neasOne(indxMask[j - 7])){
+         bb &= neasOne(bb);
          shadMask[i][j] = bb;
          j += 7;
       }
 
-      bb = seasMask[i];
-
+      bb = swesMask[i];
       j = i - 7;
-      while(j > 0 && seasOne(indxMask[j + 7])){
-         bb &= seasOne(bb);
+      while(j > 0 && swesOne(indxMask[j + 7])){
+         bb &= swesOne(bb);
          shadMask[i][j] = bb;
          j -= 7;
       }

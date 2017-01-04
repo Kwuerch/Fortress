@@ -1,10 +1,10 @@
 #ifndef CONFIG_H_INCLUDED
 #define CONFIG_H_INCLUDED
 
-#define notAFile  0xfefefefefefefefe
-#define notHFile  0x7f7f7f7f7f7f7f7f
-#define notGHFile 0x3f3f3f3f3f3f3f3f
-#define notABFile 0xfefefefefefefefe
+#define notHFile  0xfefefefefefefefe
+#define notAFile  0x7f7f7f7f7f7f7f7f
+#define notABFile 0x3f3f3f3f3f3f3f3f
+#define notGHFile 0xfefefefefefefefe
 #define notRank8  0x00ffffffffffffff
 #define notRank1  0xffffffffffffff00
 #define notAHFile 0x7e7e7e7e7e7e7e7e
