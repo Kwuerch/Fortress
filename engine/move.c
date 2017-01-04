@@ -221,17 +221,18 @@ void genBishopMoves(uint64_t occ, uint64_t opp, uint64_t bishops, moveList* ml){
     }
 }
 
-bool isKingMoveValid(board *b, Color c, Move m){
+static bool isKingMoveValid(board *b, Color c, Move m){
 
     uint8_t to = getTo(m);
-    uint64_t occ = occupied(b);
+
+    // Ensure current king piece does not affect calculations
+    uint64_t occ = occupied(b) & ~indxMask[to];
 
 
     // Check if desired move location is under control of the opponent
     if(c == WHITE){
         // Check Full Diagonal Rays for desired move location
-        for( uint64_t attackers = piecMask[BISHOP][to] & (b -> bq | b -> bh);
-                attackers != 0; attackers &= (attackers - 1)){
+        for( uint64_t attackers = piecMask[BISHOP][to] & (b -> bq | b -> bh); attackers != 0; attackers &= (attackers - 1)){
             
 
             if((fromToMask[to][bitScanForward(attackers)] & occ) == 0 ){
@@ -241,7 +242,7 @@ bool isKingMoveValid(board *b, Color c, Move m){
     
 
         // Check Full Horizontal and Vertical Rays for desired move location 
-        for( uint64_t attackers = piecMask[ROOK][to] & (b -> bq | b -> br);
+        for( uint64_t attackers = piecMask[ROOK][to] & (b -> bq | b -> br); 
                 attackers != 0; attackers &= (attackers - 1)){
             
 
@@ -251,14 +252,20 @@ bool isKingMoveValid(board *b, Color c, Move m){
         }
 
         // Check Single Rays except attacking pawn locations for desired move
-        if((nortMask[to] | soutMask[to] | eastMask[to] | westMask[to] | 
-                swesMask[to] | seasMask[to] & b -> bk) != 0){ 
+        if(((nortOne(indxMask[to]) | soutOne(indxMask[to]) | eastOne(indxMask[to]) 
+                | westOne(indxMask[to]) | swesOne(indxMask[to]) | 
+                    seasOne(indxMask[to])) & b -> bk) != 0){ 
 
             return false; 
         }
 
         // Check Single Rays of attacking pawn locations for desired move
-        if((neasMask[to] | nwesMask[to] & (b -> bk | b -> bp)) != 0){
+        if(((neasOne(indxMask[to]) | nwesOne(indxMask[to])) & (b -> bk | b -> bp)) != 0){
+            return false;
+        }
+
+        // Check Knight Attacks
+        if((piecMask[KNIGHT][to] & b -> bn) != 0){
             return false;
         }
 
@@ -285,14 +292,20 @@ bool isKingMoveValid(board *b, Color c, Move m){
         }
 
         // Check Single Rays except attacking pawn locations for desired move
-        if((nortMask[to] | soutMask[to] | eastMask[to] | westMask[to] | 
-                nwesMask[to] | neasMask[to] & b -> wk) != 0){ 
+        if(((nortOne(indxMask[to]) | soutOne(indxMask[to]) | eastOne(indxMask[to]) |
+                westOne(indxMask[to]) | nwesOne(indxMask[to]) | neasOne(indxMask[to])) 
+                    & b -> bk) != 0){ 
 
             return false; 
         }
 
         // Check Single Rays of attacking pawn locations for desired move
-        if((seasMask[to] | swesMask[to] & (b -> wk | b -> wp)) != 0){
+        if(((seasOne(indxMask[to]) | swesOne(indxMask[to])) & (b -> bk | b -> bp)) != 0){
+            return false;
+        }
+
+        // Check Knight Attacks
+        if((piecMask[KNIGHT][to] & b -> wn) != 0){
             return false;
         }
 

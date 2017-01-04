@@ -11,9 +11,11 @@
 static void testShadowMask();
 static void testFromToMask();
 static void testMasks();
+static void testValidMoveGen();
 
 void runTests(){
     testMasks();
+    testValidMoveGen();
 }
 
 static void testMasks(){
@@ -163,7 +165,7 @@ void testMoveMake(){
 
 }
 
-void testValidMoveGen(){
+static void testValidMoveGen(){
     board b;
     b.wp = 0x0000000000000000;
     b.wr = 0x0000000000000000;
@@ -193,14 +195,14 @@ void testValidMoveGen(){
     assert(cur != NULL);
 
     while(cur != NULL){
-        printMove(cur -> mv);
-
         if(cur -> mv != move1 && cur -> mv != move2 && cur -> mv != move3){
-           assert(0); 
+            assert(0); 
         }
 
         cur = cur -> next;
     }
+
+    printf("Passed Valid MoveGen\n");
 
     freeMoveList(ml);
 
