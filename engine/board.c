@@ -18,6 +18,8 @@ static const uint8_t debruijn[64] = {
     25, 14, 19, 9, 13, 8, 7, 6
 };
 
+static uint8_t popcnt( uint64_t );
+
 void initBoard( board* b){
     b -> wp = 0x000000000000ff00;
     b -> wr = 0x0000000000000081;
@@ -37,6 +39,46 @@ uint64_t black( board *b ) { return b->bp | b->br | b->bn | b->bh | b->bk | b->b
 uint64_t white( board *b ) { return b->wp | b->wr | b->wn | b->wh | b->wk | b->wq; }
 
 uint64_t occupied( board *b ){ return black(b) | white(b); }
+
+uint8_t score( board *b, Color c){
+    uint8_t score = 50; // Set to 50 to differentiate from checkmate
+
+    if( c == WHITE ){
+        score += popcnt(b -> wq) * 9;
+        score += popcnt(b -> wr) * 5;
+        score += popcnt(b -> wh) * 3;
+        score += popcnt(b -> wn) * 3;
+        score += popcnt(b -> wp) * 1;
+
+        score -= popcnt(b -> wq) * 9;
+        score -= popcnt(b -> wr) * 5;
+        score -= popcnt(b -> wh) * 3;
+        score -= popcnt(b -> wn) * 3;
+        score -= popcnt(b -> wp) * 1;
+        
+    }else{
+        score += popcnt(b -> wq) * 9;
+        score += popcnt(b -> wr) * 5;
+        score += popcnt(b -> wh) * 3;
+        score += popcnt(b -> wn) * 3;
+        score += popcnt(b -> wp) * 1;
+
+        score -= popcnt(b -> wq) * 9;
+        score -= popcnt(b -> wr) * 5;
+        score -= popcnt(b -> wh) * 3;
+        score -= popcnt(b -> wn) * 3;
+        score -= popcnt(b -> wp) * 1;
+    }
+
+    return score;
+}
+
+uint8_t popcnt(uint64_t bb){
+    uint8_t count;
+    for(count = 0; bb != 0; count++, bb &= (bb - 1));
+
+    return count;
+}
 
 /**
  * bitScanForward

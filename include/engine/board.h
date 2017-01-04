@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#include "config.h"
+
 typedef struct board{
     uint64_t wp;
     uint64_t wr;
@@ -25,6 +27,8 @@ void initBoard( board *b);
 uint64_t black( board* b );
 uint64_t white( board* b );
 uint64_t occupied( board* b );
+
+uint8_t score( board *b, Color c );
 
 uint8_t bitScanForward( uint64_t bb);
 

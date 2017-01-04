@@ -9,7 +9,7 @@
 int main(){
     initMasks();
 
-    runTests();
+    //runTests();
 
     return 0;
 }
