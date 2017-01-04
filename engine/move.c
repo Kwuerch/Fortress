@@ -64,14 +64,14 @@ moveList* genMoves(Color colr, board* b){
     if(colr == WHITE){
         genPawnMoves(colr, occ, blk, b -> wp, ml);
         genKnightMoves(occ, blk, b -> wn, ml);
-        genKingMoves(occ, blk, b -> wk, ml);
+        genKingMoves(b, WHITE, ml);
         genQueenMoves(occ, blk, b -> wq, ml);
         genRookMoves(occ, blk, b -> wr, ml);
         genBishopMoves(occ, blk, b -> wh, ml);
     }else{
         genPawnMoves(colr, occ, wht, b -> bp, ml);
         genKnightMoves(occ, wht, b -> bn, ml);
-        genKingMoves(occ, wht, b -> bk, ml);
+        genKingMoves(b, BLACK, ml);
         genQueenMoves(occ, wht, b -> bq, ml);
         genRookMoves(occ, wht, b -> br, ml);
         genBishopMoves(occ, wht, b -> bh, ml);
@@ -139,18 +139,33 @@ void genKnightMoves(uint64_t occ, uint64_t opp, uint64_t knights, moveList* ml){
     }
 }
 
-void genKingMoves(uint64_t occ, uint64_t opp, uint64_t king, moveList* ml){
-    if(king == 0){ return; }
+void genKingMoves(board *b, Color c, moveList* ml){
+    uint64_t occ = occupied(b);
+    uint64_t king;
+    uint64_t opp;
+    if(c == WHITE){
+        king = b -> wk;
+        opp = black(b);
+    }else{
+        king = b -> bk;
+        opp = white(b);
+    }
 
-    // Go through each king and append each individual's moves 
-    for(uint8_t from; king != 0; king &= (king -1)){
-        from = bitScanForward(king);
-        for(uint64_t attacks = piecMask[KING][from] & opp; attacks != 0; attacks &= (attacks - 1)){
-            addMove(ml, createMove(from, bitScanForward(attacks), CAPTURE));
+    // There is only one king
+    uint8_t from = bitScanForward(king); 
+
+    for(uint64_t attacks = piecMask[KING][from] & opp; attacks != 0; attacks &= (attacks - 1)){
+        Move mv = createMove(from, bitScanForward(attacks), CAPTURE);
+        if(isKingMoveValid(b, c, mv)){
+            addMove(ml, mv);
         }
+    }
 
-        for(uint64_t quiets = piecMask[KING][from] & ~occ; quiets != 0; quiets &= (quiets - 1)){
-            addMove(ml, createMove(from, bitScanForward(quiets), QUIET));
+    for(uint64_t quiets = piecMask[KING][from] & ~occ; quiets != 0; quiets &= (quiets - 1)){
+        Move mv = createMove(from, bitScanForward(quiets), QUIET);
+        printMove(mv);
+        if(isKingMoveValid(b, c, mv)){
+            addMove(ml, mv);
         }
     }
 }

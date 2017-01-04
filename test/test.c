@@ -162,3 +162,46 @@ void testMoveMake(){
     freeMoveStack(ms);
 
 }
+
+void testValidMoveGen(){
+    board b;
+    b.wp = 0x0000000000000000;
+    b.wr = 0x0000000000000000;
+    b.wn = 0x0000000000000000;
+    b.wh = 0x0000000000000000;
+    b.wq = 0x0000000000000000;
+    b.wk = 0x0000000000001000;
+    b.bp = 0x0000000020000000;
+    b.br = 0x0000000040000080;
+    b.bn = 0x0000000000000200;
+    b.bh = 0x0000000000000000;
+    b.bk = 0x0010000000000000;
+    b.bq = 0x0000008000000000;
+
+    printBoardFull(&b);
+
+    // Moves
+    Move move1 = createMove(12, 21, QUIET);
+    Move move2 = createMove(12, 13, QUIET);
+    Move move3 = createMove(12, 11, QUIET);
+
+
+    moveList *ml = genMoves(WHITE, &b);
+
+    moveListNode* cur = ml -> head;
+
+    assert(cur != NULL);
+
+    while(cur != NULL){
+        printMove(cur -> mv);
+
+        if(cur -> mv != move1 && cur -> mv != move2 && cur -> mv != move3){
+           assert(0); 
+        }
+
+        cur = cur -> next;
+    }
+
+    freeMoveList(ml);
+
+}
