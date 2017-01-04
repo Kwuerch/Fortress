@@ -3,19 +3,43 @@
 #include <assert.h>
 
 #include "mask.h"
+#include "eval.h"
 #include "move.h"
 #include "board.h"
 #include "moveList.h"
 #include "moveStack.h"
 
+static void testCalcBestMove();
 static void testShadowMask();
 static void testFromToMask();
 static void testMasks();
 static void testValidMoveGen();
 
 void runTests(){
-    testMasks();
-    testValidMoveGen();
+    //testMasks();
+    //testValidMoveGen();
+    testCalcBestMove();
+}
+
+static void testCalcBestMove(){
+    board b;
+    b.wp = 0x000000000000ff00;
+    b.wr = 0x0000000000000081;
+    b.wn = 0x0000000000000042;
+    b.wh = 0x0000000000000024;
+    b.wq = 0x0000000000000010;
+    b.wk = 0x0000000000000008;
+    b.bp = 0x00ff000000000000;
+    b.br = 0x8100000000000000;
+    b.bn = 0x4200000000000000;
+    b.bh = 0x2400000000000000;
+    b.bk = 0x1000000000000000;
+    b.bq = 0x0800000000000000;
+
+    printBoardFull(&b);
+
+    printMove(calcBestMove(&b));
+
 }
 
 static void testMasks(){
