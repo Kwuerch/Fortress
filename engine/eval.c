@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include "config.h"
 #include "eval.h"
@@ -9,27 +10,103 @@
 #include "move.h"
 #include "moveList.h"
 
-#define MAX_TREE_DEPTH 3
+// TODO consider 0 possible moves
+Move alphaBetaMaxRoot( board* b, int depth ){
+    if( depth == 0 ){ return scoreBoard(WHITE);}
 
-Move calcBestMove(board *b){
-    moveList *ml = genMoves(WHITE, b); 
-    moveStack *ms = moveStackNew();
+    Move maxMove;
+    int alpha = INT_MIN;
 
-    Move bestMove = 0; // Checmate
-    uint16_t maxScore = 0;
+    moveStack* ms = moveStackNew();
+    moveList *ml = genMoves(WHITE, b);
 
-    moveListNode *cur = ml -> head;
-
-    while(cur != NULL){
+    moveListNode* cur = ml -> head;
+    while( cur != NULL ){
         makeMove(WHITE, b, cur -> mv, ms);
+        int score = alphaBetaMin(b, alpha, INT_MAX, depth - 1);
+        printf("score: %i\n", score);
+        unmakeMove(b, ms);
 
-        uint16_t branchScore = scoreBranch(b, MAX_TREE_DEPTH);
-        if( branchScore > maxScore ){
-            maxScore = branchScore;
-            bestMove = cur -> mv;
+        if(score > alpha){
+            printf("Found a better score %i \n", score );
+            alpha = score;
+            maxMove = cur -> mv;
         }
 
+        cur = cur -> next;
+    }
+
+    freeMoveStack(ms);
+    freeMoveList(ml);
+
+    return maxMove;
+}
+
+int alphaBetaMax( board* b, int alpha, int beta, int depth ){
+    if( depth == 0 ){ return scoreBoard(b);}
+
+    moveStack* ms = moveStackNew();
+    moveList *ml = genMoves(WHITE, b);
+
+    moveListNode* cur = ml -> head;
+
+    if(cur == NULL){
+        printf("WHAT");
+    }
+
+    while( cur != NULL ){
+        makeMove(WHITE, b, cur -> mv, ms);
+        int score = alphaBetaMin(b, alpha, beta, depth - 1);
         unmakeMove(b, ms);
+
+        if(score >= beta){ 
+            freeMoveStack(ms);
+            freeMoveList(ml);
+            return beta;
+        }
+
+        if(score > alpha){
+            printf("Found a bettter score: %i\n", score);
+            alpha = score;
+        }
+
+
+        cur = cur -> next;
+    }
+
+    freeMoveStack(ms);
+    freeMoveList(ml);
+
+    return alpha;
+}
+
+int alphaBetaMin( board* b, int alpha, int beta, int depth ){
+    if( depth == 0 ){ printf("%i\n",-scoreBoard(b));return -scoreBoard(b); }
+
+    moveStack* ms = moveStackNew();
+    moveList* ml = genMoves(BLACK, b);
+
+    moveListNode* cur = ml -> head;
+    
+    if(cur == NULL){
+        printf("WHAT");
+    }
+
+    while( cur != NULL ){
+        makeMove(BLACK, b, cur -> mv, ms);
+        int score = alphaBetaMax(b, alpha, beta, depth - 1);
+        unmakeMove(b, ms);
+
+        if(score <= alpha){
+            freeMoveStack(ms);
+            freeMoveList(ml);
+            return alpha;
+        }
+
+        if(score < beta){
+            printf("Found a worse score %i \n", score );
+            beta = score;
+        }
 
         cur = cur -> next;
 
@@ -38,97 +115,23 @@ Move calcBestMove(board *b){
     freeMoveStack(ms);
     freeMoveList(ml);
 
-    // Returns  0 if checkmate an actual move otherwise
-    return bestMove;
+    return beta;
 }
 
-uint16_t scoreBranch(board *b, uint8_t depth){
-    uint16_t score = 0;
-    uint16_t count = 0;
+int scoreBoard( board *b){
+    int score = 0;
 
-    if( depth == 0 ){
-        return scoreBoard(b, WHITE);
-    }
+    score += popcnt(b -> wq) * 9;
+    score += popcnt(b -> wr) * 5;
+    score += popcnt(b -> wh) * 3;
+    score += popcnt(b -> wn) * 3;
+    score += popcnt(b -> wp) * 1;
 
-    moveList *blMl = genMoves(BLACK, b);
-
-    // Opponent Checkmate
-    if(blMl -> head == NULL){
-        freeMoveList(blMl);
-        return 1000;
-    }
-
-    moveStack *ms = moveStackNew();
-
-    moveListNode *curBlk = blMl -> head;
-
-    // Iterate through all black moves and generate white moves to evaluate
-    while(curBlk != NULL){
-        makeMove(BLACK, b, curBlk -> mv, ms);
-
-        // Generate new moves
-        moveList *whMl = genMoves(WHITE, b);
-
-        moveListNode *curWht = whMl -> head;
-
-        // White Checkmate
-        if(curWht == NULL){
-            count ++; // increment score by zero
-        }
-
-        while(curWht != NULL){
-            makeMove(WHITE, b, curWht -> mv, ms);
-
-            score += scoreBranch(b, depth - 1);
-            count ++;
-            
-            unmakeMove(b, ms);
-            
-            curWht = curWht -> next; 
-        }
-
-        unmakeMove(b, ms);
-        freeMoveList(whMl);
-
-        curBlk = curBlk -> next;
-    }
-
-    freeMoveList(blMl);
-    freeMoveStack(ms);
-
-    return score/count;
-}
-
-uint16_t scoreBoard( board *b, Color c){
-    uint16_t score = 100; // Set to 100 to differentiate from checkmate
-
-
-    if( c == WHITE ){
-        score += popcnt(b -> wq) * 9;
-        score += popcnt(b -> wr) * 5;
-        score += popcnt(b -> wh) * 3;
-        score += popcnt(b -> wn) * 3;
-        score += popcnt(b -> wp) * 1;
-
-        score -= popcnt(b -> wq) * 9;
-        score -= popcnt(b -> wr) * 5;
-        score -= popcnt(b -> wh) * 3;
-        score -= popcnt(b -> wn) * 3;
-        score -= popcnt(b -> wp) * 1;
-        
-    }else{
-        score += popcnt(b -> wq) * 9;
-        score += popcnt(b -> wr) * 5;
-        score += popcnt(b -> wh) * 3;
-        score += popcnt(b -> wn) * 3;
-        score += popcnt(b -> wp) * 1;
-
-        score -= popcnt(b -> wq) * 9;
-        score -= popcnt(b -> wr) * 5;
-        score -= popcnt(b -> wh) * 3;
-        score -= popcnt(b -> wn) * 3;
-        score -= popcnt(b -> wp) * 1;
-    }
+    score -= popcnt(b -> bq) * 9;
+    score -= popcnt(b -> br) * 5;
+    score -= popcnt(b -> bh) * 3;
+    score -= popcnt(b -> bn) * 3;
+    score -= popcnt(b -> bp) * 1;
 
     return score;
 }
@@ -138,32 +141,4 @@ uint8_t popcnt(uint64_t bb){
     for(count = 0; bb != 0; count++, bb &= (bb - 1));
 
     return count;
-}
-
-int alphaBetaMax(board *b, int alpha, int beta, int depth){
-    if(depth == 0){
-        return scoreBoard(b);
-    }
-
-    moveStack *ms = moveStackNew();
-    moveList *ml = genMoves(BLACK, ml);
-
-    moveListNode cur = ml -> head;
-    while(cur != NULL){
-        makeMove(b, cur -> mv, ms);
-        int score = alphaBetaMin(b, alpha, beta, depth - 1);
-
-        if(score >= aplha){
-            
-        }
-    }
-
-
-}
-
-int alphaBetaMin(board *b, int alpha, int beta, int depth){
-    if(depth == 0){
-        return scoreBoard(b);
-    }
-
 }

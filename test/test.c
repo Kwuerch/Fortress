@@ -9,6 +9,8 @@
 #include "moveList.h"
 #include "moveStack.h"
 
+#define TEST_DEPTH 3
+
 static void testCalcBestMove();
 static void testShadowMask();
 static void testFromToMask();
@@ -87,7 +89,7 @@ static void testCalcBestMove(){
 
     printBoardFull(&b);
 
-    printMove(calcBestMove(&b));
+    printMove(alphaBetaMaxRoot(&b, TEST_DEPTH));
 
 }
 
