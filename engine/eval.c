@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "config.h"
 #include "eval.h"
@@ -8,9 +9,11 @@
 #include "move.h"
 #include "moveList.h"
 
+#define MAX_TREE_DEPTH 3
+
 Move calcBestMove(board *b){
     moveList *ml = genMoves(WHITE, b); 
-    moveStack *ms = malloc(sizeof(moveStack));
+    moveStack *ms = moveStackNew();
 
     Move bestMove = 0; // Checmate
     uint16_t maxScore = 0;
@@ -20,7 +23,7 @@ Move calcBestMove(board *b){
     while(cur != NULL){
         makeMove(WHITE, b, cur -> mv, ms);
 
-        uint16_t branchScore = scoreBranch(b, 5);
+        uint16_t branchScore = scoreBranch(b, MAX_TREE_DEPTH);
         if( branchScore > maxScore ){
             maxScore = branchScore;
             bestMove = cur -> mv;
@@ -41,7 +44,7 @@ Move calcBestMove(board *b){
 
 uint16_t scoreBranch(board *b, uint8_t depth){
     uint16_t score = 0;
-    uint8_t count = 0;
+    uint16_t count = 0;
 
     if( depth == 0 ){
         return scoreBoard(b, WHITE);
@@ -55,7 +58,7 @@ uint16_t scoreBranch(board *b, uint8_t depth){
         return 1000;
     }
 
-    moveStack *ms = malloc(sizeof(moveStack));
+    moveStack *ms = moveStackNew();
 
     moveListNode *curBlk = blMl -> head;
 
@@ -99,6 +102,7 @@ uint16_t scoreBranch(board *b, uint8_t depth){
 uint16_t scoreBoard( board *b, Color c){
     uint16_t score = 100; // Set to 100 to differentiate from checkmate
 
+
     if( c == WHITE ){
         score += popcnt(b -> wq) * 9;
         score += popcnt(b -> wr) * 5;
@@ -134,4 +138,32 @@ uint8_t popcnt(uint64_t bb){
     for(count = 0; bb != 0; count++, bb &= (bb - 1));
 
     return count;
+}
+
+int alphaBetaMax(board *b, int alpha, int beta, int depth){
+    if(depth == 0){
+        return scoreBoard(b);
+    }
+
+    moveStack *ms = moveStackNew();
+    moveList *ml = genMoves(BLACK, ml);
+
+    moveListNode cur = ml -> head;
+    while(cur != NULL){
+        makeMove(b, cur -> mv, ms);
+        int score = alphaBetaMin(b, alpha, beta, depth - 1);
+
+        if(score >= aplha){
+            
+        }
+    }
+
+
+}
+
+int alphaBetaMin(board *b, int alpha, int beta, int depth){
+    if(depth == 0){
+        return scoreBoard(b);
+    }
+
 }

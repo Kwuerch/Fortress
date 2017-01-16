@@ -38,6 +38,7 @@ Move createMove( uint8_t from, uint8_t to, uint8_t moveFlag){
     mv |= (0x3f & to);
     mv <<= 4;
     mv |= (0xf & moveFlag);
+
     return mv;
 }
 
@@ -54,7 +55,7 @@ void printMove(Move mv){
 }
 
 moveList* genMoves(Color colr, board* b){
-    moveList* ml = malloc(sizeof(moveList));
+    moveList* ml = moveListNew();
     ml -> head = NULL;
     ml -> tail = NULL;
 
@@ -143,6 +144,7 @@ void genKingMoves(board *b, Color c, moveList* ml){
     uint64_t occ = occupied(b);
     uint64_t king;
     uint64_t opp;
+
     if(c == WHITE){
         king = b -> wk;
         opp = black(b);
@@ -150,6 +152,8 @@ void genKingMoves(board *b, Color c, moveList* ml){
         king = b -> bk;
         opp = white(b);
     }
+
+    if(king == 0){ return; }
 
     // There is only one king
     uint8_t from = bitScanForward(king); 
@@ -163,7 +167,6 @@ void genKingMoves(board *b, Color c, moveList* ml){
 
     for(uint64_t quiets = piecMask[KING][from] & ~occ; quiets != 0; quiets &= (quiets - 1)){
         Move mv = createMove(from, bitScanForward(quiets), QUIET);
-        printMove(mv);
         if(isKingMoveValid(b, c, mv)){
             addMove(ml, mv);
         }
@@ -314,7 +317,7 @@ static bool isKingMoveValid(board *b, Color c, Move m){
     return true;
 }
 
-void makeMove(Color c, board * b, Move m, moveStack *stk){
+void makeMove(Color c, board *b, Move m, moveStack *stk){
     uint64_t from = indxMask[getFrom(m)];
     uint64_t to = indxMask[getTo(m)];
 
@@ -363,10 +366,9 @@ void makeMove(Color c, board * b, Move m, moveStack *stk){
             break;
     }
 
-    //TODO -- .capture is not included in stackmove
-    stackMove sm = {.mv = m, .clr = c}; 
+    stackMove sm = {.mv = m, .clr = c, .to = toBoard, .from = fromBoard};
 
-    push(stk, sm);
+    push(stk, &sm);
 }
 
 // Unmakes the most recent move on the stack
@@ -376,30 +378,28 @@ void unmakeMove(board *b, moveStack *stk){
     uint64_t from = indxMask[getFrom(last.mv)];
     uint64_t to = indxMask[getTo(last.mv)];
 
-    uint64_t *fromBoard = getFromBoard(b, last.clr, last.mv);
-
-    // TODO -- This seems a bit round about, is there a better way to do this?
-    // Switching colors, since toBoard checks for captured of opposite color
-    uint64_t *toBoard = getToBoard(b, last.clr == WHITE ? BLACK : WHITE, last.mv);
+    uint64_t *fromBoard = last.from;
+    uint64_t *toBoard = last.to;
 
     uint8_t flags = getMoveFlags(last.mv);
 
-    // To and from are reversed from makeMove funtion
     switch(flags){
         case QUIET:
-            *toBoard &= ~to;
-            *toBoard |= from;
+            *fromBoard &= ~to;
+            *fromBoard |= from;
             break;
         case DOUBLE_PAWN:
-            *toBoard &= ~to;
-            *toBoard |= from;
+            *fromBoard &= ~to;
+            *fromBoard |= from;
             break;
         case KING_CASTLE:
             break;
         case QUEEN_CASTLE:
             break;
         case CAPTURE:
-            //TODO implement
+            *fromBoard &= ~to;
+            *fromBoard |= from;
+            *toBoard |= to;
             break;
         case EP_CAPTURE:
             break;
@@ -439,6 +439,11 @@ static uint64_t* getFromBoard(board *b, Color c, Move mv){
             fromBoard = &(b -> wq);
         }else if(b -> wk & from){
             fromBoard = &(b -> wk);
+        }else{
+            printf("YOU SHOULDNT BE IN THIS PLACE\n");
+            printMove(mv);
+            printBoardFull(b);
+            printf("Color is: %i", c);
         }
     }else{ // c == BLACK
         if(b -> bp & from){

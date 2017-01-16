@@ -14,11 +14,60 @@ static void testShadowMask();
 static void testFromToMask();
 static void testMasks();
 static void testValidMoveGen();
+static void testOddSegFault();
 
 void runTests(){
     //testMasks();
     //testValidMoveGen();
     testCalcBestMove();
+    //testOddSegFault();
+}
+
+static void testOddSegFault(){
+    board b;
+    b.wp = 0x000000000000ff00;
+    b.wr = 0x0000000000000081;
+    b.wn = 0x0000000000000042;
+    b.wh = 0x0000000000000024;
+    b.wq = 0x0000000000000010;
+    b.wk = 0x0000000000000008;
+    b.bp = 0x00ff000000000000;
+    b.br = 0x8100000000000000;
+    b.bn = 0x4200000000000000;
+    b.bh = 0x2400000000000000;
+    b.bk = 0x1000000000000000;
+    b.bq = 0x0800000000000000;
+
+    printBoardFull(&b);
+
+    moveStack *ms = malloc(sizeof(moveStack));
+
+    Move m = createMove( 8, 24, 1);
+    makeMove(WHITE, &b, m, ms);
+    
+    m = createMove(51, 43, 0);
+    makeMove(BLACK, &b, m, ms);
+
+    m = createMove(12, 20, 0);
+    makeMove(WHITE, &b, m, ms);
+
+    m = createMove(53, 30, 0);
+    makeMove(BLACK, &b, m, ms);
+
+    m = createMove(0, 16, 0);
+    makeMove(WHITE, &b, m, ms);
+
+    m = createMove(30, 3, 4);
+    makeMove(BLACK, &b, m, ms);
+
+    printBoardFull(&b);
+
+    moveList *ml = genMoves(WHITE, &b);
+    printMoves(ml);
+
+    freeMoveList(ml);
+    freeMoveStack(ms);
+    
 }
 
 static void testCalcBestMove(){

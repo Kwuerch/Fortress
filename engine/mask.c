@@ -56,8 +56,6 @@ void initNortMask(){
 void initWestMask(){
    uint64_t westRay = 0x00000000000000fe;
    uint64_t loopRay;
-   int i; 
-   int j;
    for( int i = 0; i < 8; i++){
       loopRay = westRay;
       for( int j = i; j < 64; j+=8){
@@ -71,8 +69,6 @@ void initWestMask(){
 void initEastMask(){
    uint64_t eastRay = 0x000000000000007f;
    uint64_t loopRay;
-   int i; 
-   int j;
    for( int i = 7; i > -1; i--){
       loopRay = eastRay;
       for( int j = i; j < 64; j+=8){

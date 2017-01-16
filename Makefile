@@ -4,4 +4,4 @@ INCLUDES += -I ./include \
 			   -I ./include/test \
 				-I ./include/engine
 all:
-	gcc -g -o $(EXE) $(SOURCE) $(INCLUDES)
+	gcc -g -Wall -o $(EXE) $(SOURCE) $(INCLUDES)

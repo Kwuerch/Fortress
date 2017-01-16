@@ -16,6 +16,7 @@ typedef struct moveList {
    moveListNode* tail;
 }moveList;
 
+moveList *moveListNew();
 void addMove(moveList* ml, Move mv);
 void printMoves(moveList* ml);
 void freeMoveList(moveList* ml);

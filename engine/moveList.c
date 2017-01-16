@@ -4,6 +4,10 @@
 
 #include <stdio.h>
 
+moveList *moveListNew(){
+    return malloc(sizeof(moveList));
+}
+
 void addMove(moveList* ml, Move mv){
    if(ml -> tail != NULL){
       

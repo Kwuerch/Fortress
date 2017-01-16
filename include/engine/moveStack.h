@@ -8,8 +8,9 @@ typedef uint16_t Move;
 
 typedef struct stackMove{
    Move mv;
-   Piece cap; //Captured piece, NULL represents no captured piece
    Color clr;
+   uint64_t *to;   // Pointer to capture or promo piece board
+   uint64_t *from; // Pointer to original piece board
 }stackMove;
 
 typedef struct moveStackNode moveStackNode;
@@ -23,7 +24,9 @@ typedef struct moveStack {
 }moveStack;
 
 
-void push(moveStack* ms, stackMove sm);
+moveStack *moveStackNew();
+stackMove *stackMoveNew();
+void push(moveStack* ms, stackMove *sm);
 stackMove pop();
 void freeMoveStack(moveStack *ms);
 void printStackMove(stackMove sm);
