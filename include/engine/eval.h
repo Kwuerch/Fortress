@@ -14,5 +14,4 @@ int      alphaBetaMin( board* b, int alpha, int beta, int depth );
 int      scoreBoard( board *b );
 uint8_t  popcnt( uint64_t bb );
 
-
 #endif

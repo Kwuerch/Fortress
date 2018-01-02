@@ -439,11 +439,6 @@ static uint64_t* getFromBoard(board *b, Color c, Move mv){
             fromBoard = &(b -> wq);
         }else if(b -> wk & from){
             fromBoard = &(b -> wk);
-        }else{
-            printf("YOU SHOULDNT BE IN THIS PLACE\n");
-            printMove(mv);
-            printBoardFull(b);
-            printf("Color is: %i", c);
         }
     }else{ // c == BLACK
         if(b -> bp & from){

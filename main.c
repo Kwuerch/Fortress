@@ -5,12 +5,13 @@
 #include "board.h"
 #include "move.h"
 #include "test.h"
+#include "game.h"
 
 int main(){
     initMasks();
+    playGame();
 
-
-    runTests();
+    //runTests();
 
     return 0;
 }

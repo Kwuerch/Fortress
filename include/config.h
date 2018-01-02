@@ -17,6 +17,13 @@
 #define aFile   0x0101010101010101
 #define babMask 0x007e7e7e7e7e7e00
 
+#define midFour 0x00003C3C3C3C0000 
+
+#define minMateVal 1000
+#define maxMateVal -1000
+
+#define noMove 0
+
 typedef enum { WHITE = 0, BLACK } Color;
 
 /** Queen, Bishop, and Rook come first to decrease size of blBeMask 

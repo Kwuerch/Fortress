@@ -10,9 +10,8 @@
 #include "move.h"
 #include "moveList.h"
 
-// TODO consider 0 possible moves
 Move alphaBetaMaxRoot( board* b, int depth ){
-    if( depth == 0 ){ return scoreBoard(WHITE);}
+    if( depth == 0 ){ return noMove; }
 
     Move maxMove;
     int alpha = INT_MIN;
@@ -24,17 +23,20 @@ Move alphaBetaMaxRoot( board* b, int depth ){
     while( cur != NULL ){
         makeMove(WHITE, b, cur -> mv, ms);
         int score = alphaBetaMin(b, alpha, INT_MAX, depth - 1);
-        printf("score: %i\n", score);
+        //printf("score: %i\n", score);
         unmakeMove(b, ms);
 
         if(score > alpha){
-            printf("Found a better score %i \n", score );
+            //printf("Found a better score %i \n", score );
             alpha = score;
             maxMove = cur -> mv;
         }
 
         cur = cur -> next;
     }
+
+    printf("Score: %i \n", alpha );
+
 
     freeMoveStack(ms);
     freeMoveList(ml);
@@ -51,7 +53,7 @@ int alphaBetaMax( board* b, int alpha, int beta, int depth ){
     moveListNode* cur = ml -> head;
 
     if(cur == NULL){
-        printf("WHAT");
+        return maxMateVal;
     }
 
     while( cur != NULL ){
@@ -66,7 +68,7 @@ int alphaBetaMax( board* b, int alpha, int beta, int depth ){
         }
 
         if(score > alpha){
-            printf("Found a bettter score: %i\n", score);
+            //printf("Found a bettter score: %i\n", score);
             alpha = score;
         }
 
@@ -81,7 +83,10 @@ int alphaBetaMax( board* b, int alpha, int beta, int depth ){
 }
 
 int alphaBetaMin( board* b, int alpha, int beta, int depth ){
-    if( depth == 0 ){ printf("%i\n",-scoreBoard(b));return -scoreBoard(b); }
+    if( depth == 0 ){ 
+        //printf("%i\n",-scoreBoard(b));
+        return -scoreBoard(b);
+    }
 
     moveStack* ms = moveStackNew();
     moveList* ml = genMoves(BLACK, b);
@@ -89,7 +94,7 @@ int alphaBetaMin( board* b, int alpha, int beta, int depth ){
     moveListNode* cur = ml -> head;
     
     if(cur == NULL){
-        printf("WHAT");
+        return minMateVal;
     }
 
     while( cur != NULL ){
@@ -104,7 +109,7 @@ int alphaBetaMin( board* b, int alpha, int beta, int depth ){
         }
 
         if(score < beta){
-            printf("Found a worse score %i \n", score );
+            //printf("Found a worse score %i \n", score );
             beta = score;
         }
 
@@ -127,11 +132,20 @@ int scoreBoard( board *b){
     score += popcnt(b -> wn) * 3;
     score += popcnt(b -> wp) * 1;
 
+    score += popcnt(b -> wq & midFour) * 3;
+    score += popcnt((b -> wr | b -> wh) & midFour) * 2;
+    score += popcnt(b -> wn & midFour) * 1;
+
+
     score -= popcnt(b -> bq) * 9;
     score -= popcnt(b -> br) * 5;
     score -= popcnt(b -> bh) * 3;
     score -= popcnt(b -> bn) * 3;
     score -= popcnt(b -> bp) * 1;
+
+    score -= popcnt(b -> bq & midFour) * 3;
+    score -= popcnt((b -> br | b -> bh) & midFour) * 2;
+    score -= popcnt(b -> bn & midFour) * 1;
 
     return score;
 }

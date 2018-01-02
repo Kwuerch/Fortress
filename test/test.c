@@ -9,7 +9,7 @@
 #include "moveList.h"
 #include "moveStack.h"
 
-#define TEST_DEPTH 3
+#define TEST_DEPTH 8
 
 static void testCalcBestMove();
 static void testShadowMask();
